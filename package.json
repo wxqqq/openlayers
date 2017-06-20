@@ -64,7 +64,7 @@
     "gaze": "^1.0.0",
     "istanbul": "0.4.5",
     "jquery": "3.2.1",
-    "jscodeshift": "^0.3.30",
+    "jscodeshift": "^0.3.32",
     "mocha": "3.4.2",
     "mocha-phantomjs-core": "^2.1.0",
     "mustache": "2.3.0",
