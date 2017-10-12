@@ -488,8 +488,12 @@ ol.format.KML.readFlatCoordinates_ = function(node) {
  */
 ol.format.KML.readURI_ = function(node) {
   var s = ol.xml.getAllTextContent(node, false).trim();
-  if (node.baseURI && node.baseURI !== 'about:blank') {
-    var url = new URL(s, node.baseURI);
+  var baseURI = node.baseURI;
+  if (!baseURI || baseURI == 'about:blank') {
+    baseURI = window.location.href;
+  }
+  if (baseURI) {
+    var url = new URL(s, baseURI);
     return url.href;
   } else {
     return s;
@@ -1065,18 +1069,24 @@ ol.format.KML.setCommonGeometryProperties_ = function(multiGeometry,
     geometries) {
   var ii = geometries.length;
   var extrudes = new Array(geometries.length);
+  var tessellates = new Array(geometries.length);
   var altitudeModes = new Array(geometries.length);
-  var geometry, i, hasExtrude, hasAltitudeMode;
-  hasExtrude = hasAltitudeMode = false;
+  var geometry, i, hasExtrude, hasTessellate, hasAltitudeMode;
+  hasExtrude = hasTessellate = hasAltitudeMode = false;
   for (i = 0; i < ii; ++i) {
     geometry = geometries[i];
     extrudes[i] = geometry.get('extrude');
+    tessellates[i] = geometry.get('tessellate');
     altitudeModes[i] = geometry.get('altitudeMode');
     hasExtrude = hasExtrude || extrudes[i] !== undefined;
+    hasTessellate = hasTessellate || tessellates[i] !== undefined;
     hasAltitudeMode = hasAltitudeMode || altitudeModes[i];
   }
   if (hasExtrude) {
     multiGeometry.set('extrude', extrudes);
+  }
+  if (hasTessellate) {
+    multiGeometry.set('tessellate', tessellates);
   }
   if (hasAltitudeMode) {
     multiGeometry.set('altitudeMode', altitudeModes);
@@ -1371,6 +1381,7 @@ ol.format.KML.LOD_PARSERS_ = ol.xml.makeStructureNS(
 ol.format.KML.EXTRUDE_AND_ALTITUDE_MODE_PARSERS_ = ol.xml.makeStructureNS(
     ol.format.KML.NAMESPACE_URIS_, {
       'extrude': ol.xml.makeObjectPropertySetter(ol.format.XSD.readBoolean),
+      'tessellate': ol.xml.makeObjectPropertySetter(ol.format.XSD.readBoolean),
       'altitudeMode': ol.xml.makeObjectPropertySetter(ol.format.XSD.readString)
     });
 
@@ -1737,8 +1748,12 @@ ol.format.KML.prototype.readSharedStyle_ = function(node, objectStack) {
     var style = ol.format.KML.readStyle_(node, objectStack);
     if (style) {
       var styleUri;
-      if (node.baseURI && node.baseURI !== 'about:blank') {
-        var url = new URL('#' + id, node.baseURI);
+      var baseURI = node.baseURI;
+      if (!baseURI || baseURI == 'about:blank') {
+        baseURI = window.location.href;
+      }
+      if (baseURI) {
+        var url = new URL('#' + id, baseURI);
         styleUri = url.href;
       } else {
         styleUri = '#' + id;
@@ -1764,8 +1779,12 @@ ol.format.KML.prototype.readSharedStyleMap_ = function(node, objectStack) {
     return;
   }
   var styleUri;
-  if (node.baseURI && node.baseURI !== 'about:blank') {
-    var url = new URL('#' + id, node.baseURI);
+  var baseURI = node.baseURI;
+  if (!baseURI || baseURI == 'about:blank') {
+    baseURI = window.location.href;
+  }
+  if (baseURI) {
+    var url = new URL('#' + id, baseURI);
     styleUri = url.href;
   } else {
     styleUri = '#' + id;
@@ -2468,10 +2487,16 @@ ol.format.KML.writePrimitiveGeometry_ = function(node, geometry, objectStack) {
   var /** @type {ol.XmlNodeStackItem} */ context = {node: node};
   context['layout'] = geometry.getLayout();
   context['stride'] = geometry.getStride();
-  ol.xml.pushSerializeAndPop(context,
-      ol.format.KML.PRIMITIVE_GEOMETRY_SERIALIZERS_,
-      ol.format.KML.COORDINATES_NODE_FACTORY_,
-      [flatCoordinates], objectStack);
+
+  // serialize properties (properties unknown to KML are not serialized)
+  var properties = geometry.getProperties();
+  properties.coordinates = flatCoordinates;
+
+  var parentNode = objectStack[objectStack.length - 1].node;
+  var orderedKeys = ol.format.KML.PRIMITIVE_GEOMETRY_SEQUENCE_[parentNode.namespaceURI];
+  var values = ol.xml.makeSequence(properties, orderedKeys);
+  ol.xml.pushSerializeAndPop(context, ol.format.KML.PRIMITIVE_GEOMETRY_SERIALIZERS_,
+      ol.xml.OBJECT_PROPERTY_NODE_FACTORY, values, objectStack, orderedKeys);
 };
 
 
@@ -2631,7 +2656,6 @@ ol.format.KML.GEOMETRY_TYPE_TO_NODENAME_ = {
   'MultiPolygon': 'MultiGeometry',
   'GeometryCollection': 'MultiGeometry'
 };
-
 
 /**
  * @const
@@ -2810,11 +2834,25 @@ ol.format.KML.PLACEMARK_SERIALIZERS_ = ol.xml.makeStructureNS(
 
 /**
  * @const
+ * @type {Object.<string, Array.<string>>}
+ * @private
+ */
+ol.format.KML.PRIMITIVE_GEOMETRY_SEQUENCE_ = ol.xml.makeStructureNS(
+    ol.format.KML.NAMESPACE_URIS_, [
+      'extrude', 'tessellate', 'altitudeMode', 'coordinates'
+    ]);
+
+
+/**
+ * @const
  * @type {Object.<string, Object.<string, ol.XmlSerializer>>}
  * @private
  */
 ol.format.KML.PRIMITIVE_GEOMETRY_SERIALIZERS_ = ol.xml.makeStructureNS(
     ol.format.KML.NAMESPACE_URIS_, {
+      'extrude': ol.xml.makeChildAppender(ol.format.XSD.writeBooleanTextNode),
+      'tessellate': ol.xml.makeChildAppender(ol.format.XSD.writeBooleanTextNode),
+      'altitudeMode': ol.xml.makeChildAppender(ol.format.XSD.writeStringTextNode),
       'coordinates': ol.xml.makeChildAppender(
           ol.format.KML.writeCoordinatesTextNode_)
     });
@@ -2924,16 +2962,6 @@ ol.format.KML.GEOMETRY_NODE_FACTORY_ = function(value, objectStack,
  * @private
  */
 ol.format.KML.COLOR_NODE_FACTORY_ = ol.xml.makeSimpleNodeFactory('color');
-
-
-/**
- * A factory for creating coordinates nodes.
- * @const
- * @type {function(*, Array.<*>, string=): (Node|undefined)}
- * @private
- */
-ol.format.KML.COORDINATES_NODE_FACTORY_ =
-    ol.xml.makeSimpleNodeFactory('coordinates');
 
 
 /**

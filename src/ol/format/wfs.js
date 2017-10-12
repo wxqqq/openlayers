@@ -461,6 +461,7 @@ ol.format.WFS.writeUpdate_ = function(node, feature, objectStack) {
   var featurePrefix = context['featurePrefix'];
   var featureNS = context['featureNS'];
   var typeName = ol.format.WFS.getTypeName_(featurePrefix, featureType);
+  var geometryName = feature.getGeometryName();
   node.setAttribute('typeName', typeName);
   ol.xml.setAttributeNS(node, ol.format.WFS.XMLNS, 'xmlns:' + featurePrefix,
       featureNS);
@@ -471,7 +472,11 @@ ol.format.WFS.writeUpdate_ = function(node, feature, objectStack) {
     for (var i = 0, ii = keys.length; i < ii; i++) {
       var value = feature.get(keys[i]);
       if (value !== undefined) {
-        values.push({name: keys[i], value: value});
+        var name = keys[i];
+        if (value instanceof ol.geom.Geometry) {
+          name = geometryName;
+        }
+        values.push({name: name, value: value});
       }
     }
     ol.xml.pushSerializeAndPop(/** @type {ol.XmlNodeStackItem} */ (
@@ -625,6 +630,21 @@ ol.format.WFS.writeBboxFilter_ = function(node, filter, objectStack) {
 
 /**
  * @param {Node} node Node.
+ * @param {ol.format.filter.Contains} filter Filter.
+ * @param {Array.<*>} objectStack Node stack.
+ * @private
+ */
+ol.format.WFS.writeContainsFilter_ = function(node, filter, objectStack) {
+  var context = objectStack[objectStack.length - 1];
+  context['srsName'] = filter.srsName;
+
+  ol.format.WFS.writeOgcPropertyName_(node, filter.geometryName);
+  ol.format.GML3.prototype.writeGeometryElement(node, filter.geometry, objectStack);
+};
+
+
+/**
+ * @param {Node} node Node.
  * @param {ol.format.filter.Intersects} filter Filter.
  * @param {Array.<*>} objectStack Node stack.
  * @private
@@ -688,12 +708,14 @@ ol.format.WFS.writeDuringFilter_ = function(node, filter, objectStack) {
 ol.format.WFS.writeLogicalFilter_ = function(node, filter, objectStack) {
   /** @type {ol.XmlNodeStackItem} */
   var item = {node: node};
-  filter.conditions.forEach(function(condition) {
+  var conditions = filter.conditions;
+  for (var i = 0, ii = conditions.length; i < ii; ++i) {
+    var condition = conditions[i];
     ol.xml.pushSerializeAndPop(item,
         ol.format.WFS.GETFEATURE_SERIALIZERS_,
         ol.xml.makeSimpleNodeFactory(condition.getTagName()),
         [condition], objectStack);
-  });
+  }
 };
 
 
@@ -839,6 +861,7 @@ ol.format.WFS.GETFEATURE_SERIALIZERS_ = {
     'Or': ol.xml.makeChildAppender(ol.format.WFS.writeLogicalFilter_),
     'Not': ol.xml.makeChildAppender(ol.format.WFS.writeNotFilter_),
     'BBOX': ol.xml.makeChildAppender(ol.format.WFS.writeBboxFilter_),
+    'Contains': ol.xml.makeChildAppender(ol.format.WFS.writeContainsFilter_),
     'Intersects': ol.xml.makeChildAppender(ol.format.WFS.writeIntersectsFilter_),
     'Within': ol.xml.makeChildAppender(ol.format.WFS.writeWithinFilter_),
     'PropertyIsEqualTo': ol.xml.makeChildAppender(ol.format.WFS.writeComparisonFilter_),

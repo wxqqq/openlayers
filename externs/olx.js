@@ -109,7 +109,7 @@ olx.LogoOptions.prototype.src;
 
 
 /**
- * @typedef {{map: (ol.Map|undefined),
+ * @typedef {{map: (ol.PluggableMap|undefined),
  *     maxLines: (number|undefined),
  *     strokeStyle: (ol.style.Stroke|undefined),
  *     targetSize: (number|undefined),
@@ -126,7 +126,7 @@ olx.GraticuleOptions;
 
 /**
  * Reference to an `ol.Map` object.
- * @type {ol.Map|undefined}
+ * @type {ol.PluggableMap|undefined}
  * @api
  */
 olx.GraticuleOptions.prototype.map;
@@ -434,6 +434,50 @@ olx.MapOptions.prototype.target;
  * @api
  */
 olx.MapOptions.prototype.view;
+
+
+/**
+ * Object literal with options for the {@link ol.Sphere.getLength} or
+ * {@link ol.Sphere.getArea} functions.
+ * @typedef {{projection: (ol.ProjectionLike|undefined),
+ *    radius: (number|undefined)}}
+ */
+olx.SphereMetricOptions;
+
+
+/**
+ * Projection of the geometry.  By default, the geometry is assumed to be in
+ * EPSG:3857 (Web Mercator).
+ * @type {(ol.ProjectionLike|undefined)}
+ * @api
+ */
+olx.SphereMetricOptions.prototype.projection;
+
+
+/**
+ * Sphere radius.  By default, the radius of the earth is used (Clarke 1866
+ * Authalic Sphere).
+ * @type {(number|undefined)}
+ * @api
+ */
+olx.SphereMetricOptions.prototype.radius;
+
+
+/**
+ * Options for tile constructors.
+ * @typedef {{transition: (number|undefined)}}
+ */
+olx.TileOptions;
+
+
+/**
+ * A duration for tile opacity transitions.  By default, tiles will render with
+ * an opacity transition that lasts 250 ms.  To change the duration, pass a
+ * number in milliseconds.  A duration of 0 disables the opacity transition.
+ * @type {number|undefined}
+ * @api
+ */
+olx.TileOptions.prototype.transition;
 
 
 /**
@@ -1843,6 +1887,7 @@ olx.format;
 
 /**
  * @typedef {{dataProjection: ol.ProjectionLike,
+ *     extent: (ol.Extent|undefined),
  *     featureProjection: ol.ProjectionLike,
  *     rightHanded: (boolean|undefined)}}
  */
@@ -1859,6 +1904,15 @@ olx.format.ReadOptions;
  * @api
  */
 olx.format.ReadOptions.prototype.dataProjection;
+
+
+/**
+ * Tile extent of the tile being read. This is only used and required for
+ * {@link ol.format.MVT}.
+ * @type {ol.Extent}
+ * @api
+ */
+olx.format.ReadOptions.prototype.extent;
 
 
 /**
@@ -2710,6 +2764,7 @@ olx.interaction.DoubleClickZoomOptions.prototype.delta;
 
 /**
  * @typedef {{formatConstructors: (Array.<function(new: ol.format.Feature)>|undefined),
+ *     source: (ol.source.Vector|undefined),
  *     projection: ol.ProjectionLike,
  *     target: (Element|undefined)}}
  */
@@ -2722,6 +2777,18 @@ olx.interaction.DragAndDropOptions;
  * @api
  */
 olx.interaction.DragAndDropOptions.prototype.formatConstructors;
+
+
+/**
+ * Optional vector source where features will be added.  If a source is provided
+ * all existing features will be removed and new features will be added when
+ * they are dropped on the target.  If you want to add features to a vector
+ * source without removing the existing features (append only), instead of
+ * providing the source option listen for the "addfeatures" event.
+ * @type {ol.source.Vector|undefined}
+ * @api
+ */
+olx.interaction.DragAndDropOptions.prototype.source;
 
 
 /**
@@ -3219,7 +3286,8 @@ olx.interaction.KeyboardZoomOptions.prototype.delta;
  *     insertVertexCondition: (ol.EventsConditionType|undefined),
  *     pixelTolerance: (number|undefined),
  *     style: (ol.style.Style|Array.<ol.style.Style>|ol.StyleFunction|undefined),
- *     features: ol.Collection.<ol.Feature>,
+ *     source: (ol.source.Vector|undefined),
+ *     features: (ol.Collection.<ol.Feature>|undefined),
  *     wrapX: (boolean|undefined)
  * }}
  */
@@ -3241,7 +3309,7 @@ olx.interaction.ModifyOptions.prototype.condition;
  * A function that takes an {@link ol.MapBrowserEvent} and returns a boolean
  * to indicate whether that event should be handled.
  * By default, {@link ol.events.condition.singleClick} with
- * {@link ol.events.condition.noModifierKeys} results in a vertex deletion.
+ * {@link ol.events.condition.altKeyOnly} results in a vertex deletion.
  * @type {ol.EventsConditionType|undefined}
  * @api
  */
@@ -3277,8 +3345,18 @@ olx.interaction.ModifyOptions.prototype.style;
 
 
 /**
- * The features the interaction works on.
- * @type {ol.Collection.<ol.Feature>}
+ * The vector source with features to modify.  If a vector source is not
+ * provided, a feature collection must be provided with the features option.
+ * @type {ol.source.Vector|undefined}
+ * @api
+ */
+olx.interaction.ModifyOptions.prototype.source;
+
+
+/**
+ * The features the interaction works on.  If a feature collection is not
+ * provided, a vector source must be provided with the source option.
+ * @type {ol.Collection.<ol.Feature>|undefined}
  * @api
  */
 olx.interaction.ModifyOptions.prototype.features;
@@ -3851,7 +3929,8 @@ olx.layer.GroupOptions.prototype.layers;
  *     maxResolution: (number|undefined),
  *     opacity: (number|undefined),
  *     source: (ol.source.Vector|undefined),
- *     visible: (boolean|undefined)}}
+ *     visible: (boolean|undefined),
+ *     zIndex: (number|undefined)}}
  */
 olx.layer.HeatmapOptions;
 
@@ -3949,13 +4028,23 @@ olx.layer.HeatmapOptions.prototype.visible;
 
 
 /**
+ * The z-index for layer rendering.  At rendering time, the layers will be
+ * ordered, first by Z-index and then by position. The default Z-index is 0.
+ * @type {number|undefined}
+ * @api
+ */
+olx.layer.HeatmapOptions.prototype.zIndex;
+
+
+/**
  * @typedef {{opacity: (number|undefined),
- *     map: (ol.Map|undefined),
+ *     map: (ol.PluggableMap|undefined),
  *     source: (ol.source.Image|undefined),
  *     visible: (boolean|undefined),
  *     extent: (ol.Extent|undefined),
  *     minResolution: (number|undefined),
- *     maxResolution: (number|undefined)}}
+ *     maxResolution: (number|undefined),
+ *     zIndex: (number|undefined)}}
  */
 olx.layer.ImageOptions;
 
@@ -3981,7 +4070,7 @@ olx.layer.ImageOptions.prototype.source;
  * layers collection, and the layer will be rendered on top. This is useful for
  * temporary layers. The standard way to add a layer to a map and have it
  * managed by the map is to use {@link ol.Map#addLayer}.
- * @type {ol.Map|undefined}
+ * @type {ol.PluggableMap|undefined}
  * @api
  */
 olx.layer.ImageOptions.prototype.map;
@@ -4021,15 +4110,25 @@ olx.layer.ImageOptions.prototype.maxResolution;
 
 
 /**
+ * The z-index for layer rendering.  At rendering time, the layers will be
+ * ordered, first by Z-index and then by position. The default Z-index is 0.
+ * @type {number|undefined}
+ * @api
+ */
+olx.layer.ImageOptions.prototype.zIndex;
+
+
+/**
  * @typedef {{opacity: (number|undefined),
  *     preload: (number|undefined),
  *     source: (ol.source.Tile|undefined),
- *     map: (ol.Map|undefined),
+ *     map: (ol.PluggableMap|undefined),
  *     visible: (boolean|undefined),
  *     extent: (ol.Extent|undefined),
  *     minResolution: (number|undefined),
  *     maxResolution: (number|undefined),
- *     useInterimTilesOnError: (boolean|undefined)}}
+ *     useInterimTilesOnError: (boolean|undefined),
+ *     zIndex: (number|undefined)}}
  */
 olx.layer.TileOptions;
 
@@ -4064,7 +4163,7 @@ olx.layer.TileOptions.prototype.source;
  * layers collection, and the layer will be rendered on top. This is useful for
  * temporary layers. The standard way to add a layer to a map and have it
  * managed by the map is to use {@link ol.Map#addLayer}.
- * @type {ol.Map|undefined}
+ * @type {ol.PluggableMap|undefined}
  * @api
  */
 olx.layer.TileOptions.prototype.map;
@@ -4112,17 +4211,27 @@ olx.layer.TileOptions.prototype.useInterimTilesOnError;
 
 
 /**
+ * The z-index for layer rendering.  At rendering time, the layers will be
+ * ordered, first by Z-index and then by position. The default Z-index is 0.
+ * @type {number|undefined}
+ * @api
+ */
+olx.layer.TileOptions.prototype.zIndex;
+
+
+/**
  * @typedef {{renderOrder: (ol.RenderOrderFunction|null|undefined),
  *     minResolution: (number|undefined),
  *     maxResolution: (number|undefined),
  *     opacity: (number|undefined),
  *     renderBuffer: (number|undefined),
  *     source: (ol.source.Vector|undefined),
- *     map: (ol.Map|undefined),
+ *     map: (ol.PluggableMap|undefined),
  *     style: (ol.style.Style|Array.<ol.style.Style>|ol.StyleFunction|undefined),
  *     updateWhileAnimating: (boolean|undefined),
  *     updateWhileInteracting: (boolean|undefined),
- *     visible: (boolean|undefined)}}
+ *     visible: (boolean|undefined),
+ *     zIndex: (number|undefined)}}
  */
 olx.layer.VectorOptions;
 
@@ -4142,7 +4251,7 @@ olx.layer.VectorOptions.prototype.renderOrder;
  * layers collection, and the layer will be rendered on top. This is useful for
  * temporary layers. The standard way to add a layer to a map and have it
  * managed by the map is to use {@link ol.Map#addLayer}.
- * @type {ol.Map|undefined}
+ * @type {ol.PluggableMap|undefined}
  * @api
  */
 olx.layer.VectorOptions.prototype.map;
@@ -4238,8 +4347,17 @@ olx.layer.VectorOptions.prototype.visible;
 
 
 /**
+ * The z-index for layer rendering.  At rendering time, the layers will be
+ * ordered, first by Z-index and then by position. The default Z-index is 0.
+ * @type {number|undefined}
+ * @api
+ */
+olx.layer.VectorOptions.prototype.zIndex;
+
+
+/**
  * @typedef {{extent: (ol.Extent|undefined),
- *     map: (ol.Map|undefined),
+ *     map: (ol.PluggableMap|undefined),
  *     minResolution: (number|undefined),
  *     maxResolution: (number|undefined),
  *     opacity: (number|undefined),
@@ -4251,7 +4369,8 @@ olx.layer.VectorOptions.prototype.visible;
  *     style: (ol.style.Style|Array.<ol.style.Style>|ol.StyleFunction|undefined),
  *     updateWhileAnimating: (boolean|undefined),
  *     updateWhileInteracting: (boolean|undefined),
- *     visible: (boolean|undefined)}}
+ *     visible: (boolean|undefined),
+ *     zIndex: (number|undefined)}}
  */
 olx.layer.VectorTileOptions;
 
@@ -4300,7 +4419,7 @@ olx.layer.VectorTileOptions.prototype.renderOrder;
  * layers collection, and the layer will be rendered on top. This is useful for
  * temporary layers. The standard way to add a layer to a map and have it
  * managed by the map is to use {@link ol.Map#addLayer}.
- * @type {ol.Map|undefined}
+ * @type {ol.PluggableMap|undefined}
  * @api
  */
 olx.layer.VectorTileOptions.prototype.map;
@@ -4394,6 +4513,15 @@ olx.layer.VectorTileOptions.prototype.visible;
 
 
 /**
+ * The z-index for layer rendering.  At rendering time, the layers will be
+ * ordered, first by Z-index and then by position. The default Z-index is 0.
+ * @type {number|undefined}
+ * @api
+ */
+olx.layer.VectorOptions.prototype.zIndex;
+
+
+/**
  * Namespace.
  * @type {Object}
  */
@@ -4402,6 +4530,8 @@ olx.render;
 
 /**
  * @typedef {{context: CanvasRenderingContext2D,
+ *     feature: (ol.Feature|ol.render.Feature),
+ *     geometry: ol.geom.SimpleGeometry,
  *     pixelRatio: number,
  *     resolution: number,
  *     rotation: number}}
@@ -4484,7 +4614,8 @@ olx.source;
  *     maxZoom: (number|undefined),
  *     reprojectionErrorThreshold: (number|undefined),
  *     tileLoadFunction: (ol.TileLoadFunctionType|undefined),
- *     wrapX: (boolean|undefined)}}
+ *     wrapX: (boolean|undefined),
+ *     transition: (number|undefined)}}
  */
 olx.source.BingMapsOptions;
 
@@ -4566,6 +4697,15 @@ olx.source.BingMapsOptions.prototype.tileLoadFunction;
  * @api
  */
 olx.source.BingMapsOptions.prototype.wrapX;
+
+
+/**
+ * Duration of the opacity transition for rendering.  To disable the opacity
+ * transition, pass `transition: 0`.
+ * @type {number|undefined}
+ * @api
+ */
+olx.source.BingMapsOptions.prototype.transition;
 
 
 /**
@@ -4732,7 +4872,8 @@ olx.source.TileUTFGridOptions.prototype.url;
  *            tileUrlFunction: (ol.TileUrlFunctionType|undefined),
  *            url: (string|undefined),
  *            urls: (Array.<string>|undefined),
- *            wrapX: (boolean|undefined)}}
+ *            wrapX: (boolean|undefined),
+ *            transition: (number|undefined)}}
  */
 olx.source.TileImageOptions;
 
@@ -4886,6 +5027,15 @@ olx.source.TileImageOptions.prototype.wrapX;
 
 
 /**
+ * Duration of the opacity transition for rendering.  To disable the opacity
+ * transition, pass `transition: 0`.
+ * @type {number|undefined}
+ * @api
+ */
+olx.source.TileImageOptions.prototype.transition;
+
+
+/**
  * @typedef {{attributions: (ol.AttributionLike|undefined),
  *            cacheSize: (number|undefined),
  *            format: (ol.format.Feature|undefined),
@@ -4901,7 +5051,8 @@ olx.source.TileImageOptions.prototype.wrapX;
  *            tileUrlFunction: (ol.TileUrlFunctionType|undefined),
  *            url: (string|undefined),
  *            urls: (Array.<string>|undefined),
- *            wrapX: (boolean|undefined)}}
+ *            wrapX: (boolean|undefined),
+ *            transition: (number|undefined)}}
  */
 olx.source.VectorTileOptions;
 
@@ -4991,10 +5142,11 @@ olx.source.VectorTileOptions.prototype.tileGrid;
  *   tile.setLoader(function() {
  *     var data = // ... fetch data
  *     var format = tile.getFormat();
- *     tile.setFeatures(format.readFeatures(data));
- *     tile.setProjection(format.readProjection(data));
- *     // uncomment the line below for ol.format.MVT only
- *     //tile.setExtent(format.getLastExtent());
+ *     tile.setFeatures(format.readFeatures(data, {
+ *       // uncomment the line below for ol.format.MVT only
+ *       extent: tile.getExtent(),
+ *       featureProjection: map.getView().getProjection()
+ *     }));
  *   };
  * });
  * ```
@@ -5038,6 +5190,15 @@ olx.source.VectorTileOptions.prototype.urls;
  * @api
  */
 olx.source.VectorTileOptions.prototype.wrapX;
+
+
+/**
+ * Duration of the opacity transition for rendering.  To disable the opacity
+ * transition, pass `transition: 0`.
+ * @type {number|undefined}
+ * @api
+ */
+olx.source.VectorTileOptions.prototype.transition;
 
 
 /**
@@ -5326,7 +5487,7 @@ olx.source.OSMOptions.prototype.wrapX;
 
 
 /**
- * @typedef {{attributions: (Array.<ol.Attribution>|undefined),
+ * @typedef {{attributions: (ol.AttributionLike|undefined),
  *     crossOrigin: (null|string|undefined),
  *     hidpi: (boolean|undefined),
  *     logo: (string|olx.LogoOptions|undefined),
@@ -5342,7 +5503,7 @@ olx.source.ImageArcGISRestOptions;
 
 /**
  * Attributions.
- * @type {Array.<ol.Attribution>|undefined}
+ * @type {ol.AttributionLike|undefined}
  * @api
  */
 olx.source.ImageArcGISRestOptions.prototype.attributions;
@@ -5956,7 +6117,8 @@ olx.source.ImageStaticOptions.prototype.url;
  *     tileLoadFunction: (ol.TileLoadFunctionType|undefined),
  *     url: (string|undefined),
  *     urls: (Array.<string>|undefined),
- *     wrapX: (boolean|undefined)}}
+ *     wrapX: (boolean|undefined),
+ *     transition: (number|undefined)}}
  */
 olx.source.TileArcGISRestOptions;
 
@@ -6071,6 +6233,15 @@ olx.source.TileArcGISRestOptions.prototype.wrapX;
 
 
 /**
+ * Duration of the opacity transition for rendering.  To disable the opacity
+ * transition, pass `transition: 0`.
+ * @type {number|undefined}
+ * @api
+ */
+olx.source.TileArcGISRestOptions.prototype.transition;
+
+
+/**
  * ArcGIS Rest service urls. Use this instead of `url` when the ArcGIS Service supports multiple
  * urls for export requests.
  * @type {Array.<string>|undefined}
@@ -6088,7 +6259,8 @@ olx.source.TileArcGISRestOptions.prototype.urls;
  *     tileJSON: (TileJSON|undefined),
  *     tileLoadFunction: (ol.TileLoadFunctionType|undefined),
  *     url: (string|undefined),
- *     wrapX: (boolean|undefined)}}
+ *     wrapX: (boolean|undefined),
+ *     transition: (number|undefined)}}
  */
 olx.source.TileJSONOptions;
 
@@ -6180,6 +6352,15 @@ olx.source.TileJSONOptions.prototype.wrapX;
 
 
 /**
+ * Duration of the opacity transition for rendering.  To disable the opacity
+ * transition, pass `transition: 0`.
+ * @type {number|undefined}
+ * @api
+ */
+olx.source.TileJSONOptions.prototype.transition;
+
+
+/**
  * @typedef {{attributions: (ol.AttributionLike|undefined),
  *     cacheSize: (number|undefined),
  *     params: Object.<string,*>,
@@ -6197,7 +6378,8 @@ olx.source.TileJSONOptions.prototype.wrapX;
  *     tileLoadFunction: (ol.TileLoadFunctionType|undefined),
  *     url: (string|undefined),
  *     urls: (Array.<string>|undefined),
- *     wrapX: (boolean|undefined)}}
+ *     wrapX: (boolean|undefined),
+ *     transition: (number|undefined)}}
  */
 olx.source.TileWMSOptions;
 
@@ -6362,6 +6544,15 @@ olx.source.TileWMSOptions.prototype.wrapX;
 
 
 /**
+ * Duration of the opacity transition for rendering.  To disable the opacity
+ * transition, pass `transition: 0`.
+ * @type {number|undefined}
+ * @api
+ */
+olx.source.TileWMSOptions.prototype.transition;
+
+
+/**
  * @typedef {{attributions: (ol.AttributionLike|undefined),
  *     features: (Array.<ol.Feature>|ol.Collection.<ol.Feature>|undefined),
  *     format: (ol.format.Feature|undefined),
@@ -6516,7 +6707,8 @@ olx.source.VectorOptions.prototype.wrapX;
  *     tileClass: (function(new: ol.ImageTile, ol.TileCoord,
  *                          ol.TileState, string, ?string,
  *                          ol.TileLoadFunctionType)|undefined),
- *     wrapX: (boolean|undefined)}}
+ *     wrapX: (boolean|undefined),
+ *     transition: (number|undefined)}}
  */
 olx.source.WMTSOptions;
 
@@ -6701,6 +6893,15 @@ olx.source.WMTSOptions.prototype.wrapX;
 
 
 /**
+ * Duration of the opacity transition for rendering.  To disable the opacity
+ * transition, pass `transition: 0`.
+ * @type {number|undefined}
+ * @api
+ */
+olx.source.WMTSOptions.prototype.transition;
+
+
+/**
  * @typedef {{attributions: (ol.AttributionLike|undefined),
  *     cacheSize: (number|undefined),
  *     crossOrigin: (null|string|undefined),
@@ -6717,7 +6918,8 @@ olx.source.WMTSOptions.prototype.wrapX;
  *     tileUrlFunction: (ol.TileUrlFunctionType|undefined),
  *     url: (string|undefined),
  *     urls: (Array.<string>|undefined),
- *     wrapX: (boolean|undefined)}}
+ *     wrapX: (boolean|undefined),
+ *     transition: (number|undefined)}}
  */
 olx.source.XYZOptions;
 
@@ -6873,6 +7075,16 @@ olx.source.XYZOptions.prototype.urls;
  */
 olx.source.XYZOptions.prototype.wrapX;
 
+
+/**
+ * Duration of the opacity transition for rendering.  To disable the opacity
+ * transition, pass `transition: 0`.
+ * @type {number|undefined}
+ * @api
+ */
+olx.source.XYZOptions.prototype.transition;
+
+
 /**
  * @typedef {{attributions: (ol.AttributionLike|undefined),
  *     cacheSize: (number|undefined),
@@ -6997,7 +7209,8 @@ olx.source.CartoDBOptions.prototype.account;
  *     reprojectionErrorThreshold: (number|undefined),
  *     url: !string,
  *     tierSizeCalculation: (string|undefined),
- *     size: ol.Size}}
+ *     size: ol.Size,
+ *     transition: (number|undefined)}}
  */
 olx.source.ZoomifyOptions;
 
@@ -7061,6 +7274,9 @@ olx.source.ZoomifyOptions.prototype.reprojectionErrorThreshold;
  * `http://my.zoomify.info/IMAGE.TIF/`. A URL template must include
  * `{TileGroup}`, `{x}`, `{y}`, and `{z}` placeholders, e.g.
  * `http://my.zoomify.info/IMAGE.TIF/{TileGroup}/{z}-{x}-{y}.jpg`.
+ * Internet Imaging Protocol (IIP) with JTL extension can be also used with
+ * `{tileIndex}` and `{z}` placeholders, e.g.
+ * `http://my.zoomify.info?FIF=IMAGE.TIF&JTL={z},{tileIndex}`.
  * A `{?-?}` template pattern, for example `subdomain{a-f}.domain.com`, may be
  * used instead of defining each one separately in the `urls` option.
  * @type {!string}
@@ -7083,6 +7299,15 @@ olx.source.ZoomifyOptions.prototype.tierSizeCalculation;
  * @api
  */
 olx.source.ZoomifyOptions.prototype.size;
+
+
+/**
+ * Duration of the opacity transition for rendering.  To disable the opacity
+ * transition, pass `transition: 0`.
+ * @type {number|undefined}
+ * @api
+ */
+olx.source.ZoomifyOptions.prototype.transition;
 
 
 /**
@@ -7541,8 +7766,11 @@ olx.style.StrokeOptions.prototype.width;
 
 /**
  * @typedef {{font: (string|undefined),
+ *     exceedLength: (boolean|undefined),
+ *     maxAngle: (number|undefined),
  *     offsetX: (number|undefined),
  *     offsetY: (number|undefined),
+ *     placement: (ol.style.TextPlacement|string|undefined),
  *     scale: (number|undefined),
  *     rotateWithView: (boolean|undefined),
  *     rotation: (number|undefined),
@@ -7556,6 +7784,16 @@ olx.style.TextOptions;
 
 
 /**
+ * For polygon labels or when `placement` is set to `'line'`, allow text to
+ * exceed the width of the polygon at the the label position or the length of
+ * the path that it follows. Default is `false`.
+ * @type {boolean|undefined}
+ * @api
+ */
+olx.style.TextOptions.prototype.exceedLength;
+
+
+/**
  * Font style as CSS 'font' value, see:
  * {@link https://developer.mozilla.org/en-US/docs/Web/API/CanvasRenderingContext2D/font}.
  * Default is '10px sans-serif'
@@ -7563,6 +7801,16 @@ olx.style.TextOptions;
  * @api
  */
 olx.style.TextOptions.prototype.font;
+
+
+/**
+ * When `placement` is set to `'line'`, allow a maximum angle between adjacent
+ * characters. The expected value is in radians, and the default is 45°
+ * (`Math.PI / 4`).
+ * @type {number|undefined}
+ * @api
+ */
+olx.style.TextOptions.prototype.maxAngle;
 
 
 /**
@@ -7581,6 +7829,14 @@ olx.style.TextOptions.prototype.offsetX;
  * @api
  */
 olx.style.TextOptions.prototype.offsetY;
+
+
+/**
+ * Text placement.
+ * @type {ol.style.TextPlacement|undefined}
+ * @api
+ */
+olx.style.TextOptions.prototype.placement;
 
 
 /**
@@ -7617,7 +7873,9 @@ olx.style.TextOptions.prototype.text;
 
 /**
  * Text alignment. Possible values: 'left', 'right', 'center', 'end' or 'start'.
- * Default is 'start'.
+ * Default is 'center' for `placement: 'point'`. For `placement: 'line'`, the
+ * default is to let the renderer choose a placement where `maxAngle` is not
+ * exceeded.
  * @type {string|undefined}
  * @api
  */
@@ -7626,7 +7884,7 @@ olx.style.TextOptions.prototype.textAlign;
 
 /**
  * Text base line. Possible values: 'bottom', 'top', 'middle', 'alphabetic',
- * 'hanging', 'ideographic'. Default is 'alphabetic'.
+ * 'hanging', 'ideographic'. Default is 'middle'.
  * @type {string|undefined}
  * @api
  */
@@ -8071,7 +8329,6 @@ olx.view.FitOptions.prototype.callback;
 
 /**
  * @typedef {{animate: boolean,
- *     attributions: Object.<string, ol.Attribution>,
  *     coordinateToPixelTransform: ol.Transform,
  *     extent: (null|ol.Extent),
  *     focus: ol.Coordinate,
@@ -8119,7 +8376,8 @@ olx.FrameState.prototype.viewState;
  * @typedef {{center: ol.Coordinate,
  *     projection: ol.proj.Projection,
  *     resolution: number,
- *     rotation: number}}
+ *     rotation: number,
+ *     zoom: number}}
  */
 olx.ViewState;
 
@@ -8150,6 +8408,14 @@ olx.ViewState.prototype.resolution;
  * @api
  */
 olx.ViewState.prototype.rotation;
+
+
+/**
+ * The current zoom level.
+ * @type {number}
+ * @api
+ */
+olx.ViewState.prototype.zoom;
 
 
 /**
@@ -8187,3 +8453,49 @@ olx.style.AtlasManagerOptions.prototype.maxSize;
  * @api
  */
 olx.style.AtlasManagerOptions.prototype.space;
+
+
+/**
+ * @typedef {{handles: function(ol.renderer.Type):boolean,
+ *     create: function(Element, ol.PluggableMap):ol.renderer.Map}}
+ */
+olx.MapRendererPlugin;
+
+
+/**
+ * Determine if this renderer handles the provided layer.
+ * @type {function(ol.renderer.Type):boolean}
+ * @api
+ */
+olx.MapRendererPlugin.prototype.handles;
+
+
+/**
+ * Create the map renderer.
+ * @type {function(Element, ol.PluggableMap):ol.renderer.Map}
+ * @api
+ */
+olx.MapRendererPlugin.prototype.create;
+
+
+/**
+ * @typedef {{handles: function(ol.renderer.Type, ol.layer.Layer):boolean,
+ *     create: function(ol.renderer.Map, ol.layer.Layer):ol.renderer.Layer}}
+ */
+olx.LayerRendererPlugin;
+
+
+/**
+ * Determine if this renderer handles the provided layer.
+ * @type {function(ol.renderer.Type, ol.layer.Layer):boolean}
+ * @api
+ */
+olx.LayerRendererPlugin.prototype.handles;
+
+
+/**
+ * Create a layer renderer.
+ * @type {function(ol.renderer.Map, ol.layer.Layer):ol.renderer.Layer}
+ * @api
+ */
+olx.LayerRendererPlugin.prototype.create;
