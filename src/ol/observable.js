@@ -145,12 +145,30 @@ ol.Observable.prototype.once = function(type, listener, opt_this) {
  * @api
  */
 ol.Observable.prototype.un = function(type, listener, opt_this) {
+  if (!type) {
+    var listenerMap = ol.events.getListenerMap(this);
+    for (var type1 in listenerMap) {
+      var listeners = listenerMap[type1];
+      if (listeners[0].bindTo == undefined) {
+        ol.events.removeListeners(this, type1);
+      }
+    }
+    return;
+  }
   if (Array.isArray(type)) {
     for (var i = 0, ii = type.length; i < ii; ++i) {
-      ol.events.unlisten(this, type[i], listener, opt_this);
+      if (!listener) {
+        ol.events.removeListeners(this, type[i]);
+      } else {
+        ol.events.unlisten(this, type[i], listener, opt_this);
+      }
     }
     return;
   } else {
-    ol.events.unlisten(this, /** @type {string} */ (type), listener, opt_this);
+    if (!listener) {
+      ol.events.removeListeners(this, type);
+    } else {
+      ol.events.unlisten(this, /** @type {string} */ (type), listener, opt_this);
+    }
   }
 };

@@ -238,3 +238,25 @@ ol.events.unlistenAll = function(target) {
     ol.events.removeListeners_(target, type);
   }
 };
+
+/**
+ * Clean up all listener objects of the given type.  All properties on the
+ * listener objects will be removed, and if no listeners remain in the listener
+ * map, it will be removed from the target.
+ * @param {ol.EventTargetLike} target Target.
+ * @param {string} type Type.
+ */
+ol.events.removeListeners = function(target, type) {
+  ol.events.removeListeners_(target, type);
+};
+
+/**
+ * Get the lookup of listeners.  If one does not exist on the target, it is
+ * created.
+ * @param {ol.EventTargetLike} target Target.
+ * @return {!Object.<string, Array.<ol.EventsKey>>} Map of
+ *     listeners by event type.
+ */
+ol.events.getListenerMap = function(target) {
+  return ol.events.getListenerMap_(target);
+};
