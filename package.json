@@ -1,6 +1,6 @@
 {
   "name": "openlayers",
-  "version": "4.4.1",
+  "version": "4.4.2",
   "description": "Build tools and sources for developing OpenLayers based mapping applications",
   "keywords": [
     "map",
@@ -39,7 +39,7 @@
   ],
   "dependencies": {
     "async": "2.5.0",
-    "closure-util": "1.24.1",
+    "closure-util": "1.24.2",
     "fs-extra": "4.0.2",
     "jsdoc": "3.5.5",
     "nomnom": "1.8.1",
@@ -57,7 +57,7 @@
     "clean-css-cli": "4.1.10",
     "coveralls": "3.0.0",
     "debounce": "^1.0.0",
-    "eslint": "4.8.0",
+    "eslint": "4.9.0",
     "eslint-config-openlayers": "7.0.0",
     "eslint-plugin-openlayers-internal": "^3.1.0",
     "expect.js": "0.3.1",
