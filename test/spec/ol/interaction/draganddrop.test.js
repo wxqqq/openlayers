@@ -1,36 +1,34 @@
-
-
-goog.require('ol');
-goog.require('ol.View');
-goog.require('ol.events.Event');
-goog.require('ol.events.EventTarget');
-goog.require('ol.format.GeoJSON');
-goog.require('ol.interaction.DragAndDrop');
-goog.require('ol.source.Vector');
+import {inherits} from '../../../../src/ol/index.js';
+import _ol_View_ from '../../../../src/ol/View.js';
+import Event from '../../../../src/ol/events/Event.js';
+import EventTarget from '../../../../src/ol/events/EventTarget.js';
+import GeoJSON from '../../../../src/ol/format/GeoJSON.js';
+import DragAndDrop from '../../../../src/ol/interaction/DragAndDrop.js';
+import _ol_source_Vector_ from '../../../../src/ol/source/Vector.js';
 
 where('FileReader').describe('ol.interaction.DragAndDrop', function() {
   var viewport, map, interaction;
 
   beforeEach(function() {
-    viewport = new ol.events.EventTarget();
+    viewport = new EventTarget();
     map = {
       getViewport: function() {
         return viewport;
       },
       getView: function() {
-        return new ol.View();
+        return new _ol_View_();
       }
     };
-    interaction = new ol.interaction.DragAndDrop({
-      formatConstructors: [ol.format.GeoJSON]
+    interaction = new DragAndDrop({
+      formatConstructors: [GeoJSON]
     });
   });
 
   describe('constructor', function() {
 
     it('can be constructed without arguments', function() {
-      var interaction = new ol.interaction.DragAndDrop();
-      expect(interaction).to.be.an(ol.interaction.DragAndDrop);
+      var interaction = new DragAndDrop();
+      expect(interaction).to.be.an(DragAndDrop);
     });
 
     it('sets formatConstructors on the instance', function() {
@@ -38,9 +36,9 @@ where('FileReader').describe('ol.interaction.DragAndDrop', function() {
     });
 
     it('accepts a source option', function() {
-      var source = new ol.source.Vector();
-      var drop = new ol.interaction.DragAndDrop({
-        formatConstructors: [ol.format.GeoJSON],
+      var source = new _ol_source_Vector_();
+      var drop = new DragAndDrop({
+        formatConstructors: [GeoJSON],
         source: source
       });
       expect(drop.source_).to.equal(source);
@@ -74,9 +72,9 @@ where('FileReader').describe('ol.interaction.DragAndDrop', function() {
     });
 
     it('registers and unregisters listeners on a custom target', function() {
-      var customTarget = new ol.events.EventTarget();
-      interaction = new ol.interaction.DragAndDrop({
-        formatConstructors: [ol.format.GeoJSON],
+      var customTarget = new EventTarget();
+      interaction = new DragAndDrop({
+        formatConstructors: [GeoJSON],
         target: customTarget
       });
       interaction.setMap(map);
@@ -97,13 +95,13 @@ where('FileReader').describe('ol.interaction.DragAndDrop', function() {
       OrigFileReader = FileReader;
 
       FileReader = function() {
-        ol.events.EventTarget.apply(this, arguments);
+        EventTarget.apply(this, arguments);
         this.readAsText = function(file) {
           this.result = file;
           this.dispatchEvent('load');
         };
       };
-      ol.inherits(FileReader, ol.events.EventTarget);
+      inherits(FileReader, EventTarget);
     });
 
     afterEach(function() {
@@ -116,7 +114,7 @@ where('FileReader').describe('ol.interaction.DragAndDrop', function() {
         done();
       });
       interaction.setMap(map);
-      var event = new ol.events.Event();
+      var event = new Event();
       event.dataTransfer = {};
       event.type = 'dragenter';
       viewport.dispatchEvent(event);
@@ -138,9 +136,9 @@ where('FileReader').describe('ol.interaction.DragAndDrop', function() {
     });
 
     it('adds dropped features to a source', function(done) {
-      var source = new ol.source.Vector();
-      var drop = new ol.interaction.DragAndDrop({
-        formatConstructors: [ol.format.GeoJSON],
+      var source = new _ol_source_Vector_();
+      var drop = new DragAndDrop({
+        formatConstructors: [GeoJSON],
         source: source
       });
       drop.setMap(map);
@@ -151,7 +149,7 @@ where('FileReader').describe('ol.interaction.DragAndDrop', function() {
         done();
       });
 
-      var event = new ol.events.Event();
+      var event = new Event();
       event.dataTransfer = {};
       event.type = 'dragenter';
       viewport.dispatchEvent(event);

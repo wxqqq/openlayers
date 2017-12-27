@@ -1,45 +1,45 @@
-goog.require('ol.Map');
-goog.require('ol.View');
-goog.require('ol.interaction.Draw');
-goog.require('ol.interaction.Modify');
-goog.require('ol.interaction.Select');
-goog.require('ol.interaction.Snap');
-goog.require('ol.layer.Tile');
-goog.require('ol.layer.Vector');
-goog.require('ol.source.OSM');
-goog.require('ol.source.Vector');
-goog.require('ol.style.Circle');
-goog.require('ol.style.Fill');
-goog.require('ol.style.Stroke');
-goog.require('ol.style.Style');
+import Map from '../src/ol/Map.js';
+import _ol_View_ from '../src/ol/View.js';
+import Draw from '../src/ol/interaction/Draw.js';
+import _ol_interaction_Modify_ from '../src/ol/interaction/Modify.js';
+import _ol_interaction_Select_ from '../src/ol/interaction/Select.js';
+import _ol_interaction_Snap_ from '../src/ol/interaction/Snap.js';
+import TileLayer from '../src/ol/layer/Tile.js';
+import _ol_layer_Vector_ from '../src/ol/layer/Vector.js';
+import _ol_source_OSM_ from '../src/ol/source/OSM.js';
+import _ol_source_Vector_ from '../src/ol/source/Vector.js';
+import _ol_style_Circle_ from '../src/ol/style/Circle.js';
+import _ol_style_Fill_ from '../src/ol/style/Fill.js';
+import _ol_style_Stroke_ from '../src/ol/style/Stroke.js';
+import _ol_style_Style_ from '../src/ol/style/Style.js';
 
-var raster = new ol.layer.Tile({
-  source: new ol.source.OSM()
+var raster = new TileLayer({
+  source: new _ol_source_OSM_()
 });
 
-var vector = new ol.layer.Vector({
-  source: new ol.source.Vector(),
-  style: new ol.style.Style({
-    fill: new ol.style.Fill({
+var vector = new _ol_layer_Vector_({
+  source: new _ol_source_Vector_(),
+  style: new _ol_style_Style_({
+    fill: new _ol_style_Fill_({
       color: 'rgba(255, 255, 255, 0.2)'
     }),
-    stroke: new ol.style.Stroke({
+    stroke: new _ol_style_Stroke_({
       color: '#ffcc33',
       width: 2
     }),
-    image: new ol.style.Circle({
+    image: new _ol_style_Circle_({
       radius: 7,
-      fill: new ol.style.Fill({
+      fill: new _ol_style_Fill_({
         color: '#ffcc33'
       })
     })
   })
 });
 
-var map = new ol.Map({
+var map = new Map({
   layers: [raster, vector],
   target: 'map',
-  view: new ol.View({
+  view: new _ol_View_({
     center: [-11000000, 4600000],
     zoom: 4
   })
@@ -47,10 +47,10 @@ var map = new ol.Map({
 
 var Modify = {
   init: function() {
-    this.select = new ol.interaction.Select();
+    this.select = new _ol_interaction_Select_();
     map.addInteraction(this.select);
 
-    this.modify = new ol.interaction.Modify({
+    this.modify = new _ol_interaction_Modify_({
       features: this.select.getFeatures()
     });
     map.addInteraction(this.modify);
@@ -73,7 +73,7 @@ Modify.init();
 
 var optionsForm = document.getElementById('options-form');
 
-var Draw = {
+var ExampleDraw = {
   init: function() {
     map.addInteraction(this.Point);
     this.Point.setActive(false);
@@ -84,21 +84,21 @@ var Draw = {
     map.addInteraction(this.Circle);
     this.Circle.setActive(false);
   },
-  Point: new ol.interaction.Draw({
+  Point: new Draw({
     source: vector.getSource(),
-    type: /** @type {ol.geom.GeometryType} */ ('Point')
+    type: 'Point'
   }),
-  LineString: new ol.interaction.Draw({
+  LineString: new Draw({
     source: vector.getSource(),
-    type: /** @type {ol.geom.GeometryType} */ ('LineString')
+    type: 'LineString'
   }),
-  Polygon: new ol.interaction.Draw({
+  Polygon: new Draw({
     source: vector.getSource(),
-    type: /** @type {ol.geom.GeometryType} */ ('Polygon')
+    type: 'Polygon'
   }),
-  Circle: new ol.interaction.Draw({
+  Circle: new Draw({
     source: vector.getSource(),
-    type: /** @type {ol.geom.GeometryType} */ ('Circle')
+    type: 'Circle'
   }),
   getActive: function() {
     return this.activeType ? this[this.activeType].getActive() : false;
@@ -115,7 +115,7 @@ var Draw = {
     }
   }
 };
-Draw.init();
+ExampleDraw.init();
 
 
 /**
@@ -144,7 +144,7 @@ Modify.setActive(false);
 // The snap interaction must be added after the Modify and Draw interactions
 // in order for its map browser event handlers to be fired first. Its handlers
 // are responsible of doing the snapping.
-var snap = new ol.interaction.Snap({
+var snap = new _ol_interaction_Snap_({
   source: vector.getSource()
 });
 map.addInteraction(snap);

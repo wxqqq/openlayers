@@ -1,28 +1,26 @@
-
-
-goog.require('ol.Feature');
-goog.require('ol.format.OSMXML');
-goog.require('ol.geom.Point');
-goog.require('ol.geom.LineString');
-goog.require('ol.proj');
+import _ol_Feature_ from '../../../../src/ol/Feature.js';
+import OSMXML from '../../../../src/ol/format/OSMXML.js';
+import Point from '../../../../src/ol/geom/Point.js';
+import LineString from '../../../../src/ol/geom/LineString.js';
+import {get as getProjection, transform} from '../../../../src/ol/proj.js';
 
 
 describe('ol.format.OSMXML', function() {
 
   var format;
   beforeEach(function() {
-    format = new ol.format.OSMXML();
+    format = new OSMXML();
   });
 
   describe('#readProjection', function() {
     it('returns the default projection from document', function() {
       var projection = format.readProjectionFromDocument();
-      expect(projection).to.eql(ol.proj.get('EPSG:4326'));
+      expect(projection).to.eql(getProjection('EPSG:4326'));
     });
 
     it('returns the default projection from node', function() {
       var projection = format.readProjectionFromNode();
-      expect(projection).to.eql(ol.proj.get('EPSG:4326'));
+      expect(projection).to.eql(getProjection('EPSG:4326'));
     });
   });
 
@@ -51,9 +49,9 @@ describe('ol.format.OSMXML', function() {
       var fs = format.readFeatures(text);
       expect(fs).to.have.length(2);
       var f = fs[0];
-      expect(f).to.be.an(ol.Feature);
+      expect(f).to.be.an(_ol_Feature_);
       var g = f.getGeometry();
-      expect(g).to.be.an(ol.geom.Point);
+      expect(g).to.be.an(Point);
       expect(g.getCoordinates()).to.eql([2, 1]);
     });
 
@@ -76,14 +74,14 @@ describe('ol.format.OSMXML', function() {
       var fs = format.readFeatures(text);
       expect(fs).to.have.length(3);
       var point = fs[0];
-      expect(point).to.be.an(ol.Feature);
+      expect(point).to.be.an(_ol_Feature_);
       var g = point.getGeometry();
-      expect(g).to.be.an(ol.geom.Point);
+      expect(g).to.be.an(Point);
       expect(g.getCoordinates()).to.eql([2, 1]);
       var line = fs[2];
-      expect(line).to.be.an(ol.Feature);
+      expect(line).to.be.an(_ol_Feature_);
       g = line.getGeometry();
-      expect(g).to.be.an(ol.geom.LineString);
+      expect(g).to.be.an(LineString);
       expect(g.getCoordinates()).to.eql([[2, 1], [4, 3]]);
     });
 
@@ -107,9 +105,9 @@ describe('ol.format.OSMXML', function() {
       var fs = format.readFeatures(text);
       expect(fs).to.have.length(3);
       var line = fs[2];
-      expect(line).to.be.an(ol.Feature);
+      expect(line).to.be.an(_ol_Feature_);
       var g = line.getGeometry();
-      expect(g).to.be.an(ol.geom.LineString);
+      expect(g).to.be.an(LineString);
       expect(g.getCoordinates()).to.eql([[2, 1], [4, 3]]);
     });
 
@@ -130,11 +128,11 @@ describe('ol.format.OSMXML', function() {
       });
       expect(fs).to.have.length(2);
       var f = fs[0];
-      expect(f).to.be.an(ol.Feature);
+      expect(f).to.be.an(_ol_Feature_);
       var g = f.getGeometry();
-      expect(g).to.be.an(ol.geom.Point);
+      expect(g).to.be.an(Point);
       expect(g.getCoordinates()).to.eql(
-          ol.proj.transform([2, 1], 'EPSG:4326', 'EPSG:3857'));
+          transform([2, 1], 'EPSG:4326', 'EPSG:3857'));
     });
 
   });

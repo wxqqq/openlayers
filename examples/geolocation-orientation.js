@@ -1,38 +1,38 @@
-goog.require('ol.Geolocation');
-goog.require('ol.Map');
-goog.require('ol.Overlay');
-goog.require('ol.View');
-goog.require('ol.control');
-goog.require('ol.geom.LineString');
-goog.require('ol.layer.Tile');
-goog.require('ol.proj');
-goog.require('ol.source.OSM');
+import Geolocation from '../src/ol/Geolocation.js';
+import Map from '../src/ol/Map.js';
+import _ol_Overlay_ from '../src/ol/Overlay.js';
+import _ol_View_ from '../src/ol/View.js';
+import {defaults as defaultControls} from '../src/ol/control.js';
+import LineString from '../src/ol/geom/LineString.js';
+import TileLayer from '../src/ol/layer/Tile.js';
+import {fromLonLat} from '../src/ol/proj.js';
+import _ol_source_OSM_ from '../src/ol/source/OSM.js';
 
 // creating the view
-var view = new ol.View({
-  center: ol.proj.fromLonLat([5.8713, 45.6452]),
+var view = new _ol_View_({
+  center: fromLonLat([5.8713, 45.6452]),
   zoom: 19
 });
 
 // creating the map
-var map = new ol.Map({
+var map = new Map({
   layers: [
-    new ol.layer.Tile({
-      source: new ol.source.OSM()
+    new TileLayer({
+      source: new _ol_source_OSM_()
     })
   ],
   target: 'map',
-  controls: ol.control.defaults({
-    attributionOptions: /** @type {olx.control.AttributionOptions} */ ({
+  controls: defaultControls({
+    attributionOptions: {
       collapsible: false
-    })
+    }
   }),
   view: view
 });
 
 // Geolocation marker
 var markerEl = document.getElementById('geolocation_marker');
-var marker = new ol.Overlay({
+var marker = new _ol_Overlay_({
   positioning: 'center-center',
   element: markerEl,
   stopEvent: false
@@ -42,18 +42,18 @@ map.addOverlay(marker);
 // LineString to store the different geolocation positions. This LineString
 // is time aware.
 // The Z dimension is actually used to store the rotation (heading).
-var positions = new ol.geom.LineString([],
+var positions = new LineString([],
     /** @type {ol.geom.GeometryLayout} */ ('XYZM'));
 
 // Geolocation Control
-var geolocation = new ol.Geolocation(/** @type {olx.GeolocationOptions} */ ({
+var geolocation = new Geolocation({
   projection: view.getProjection(),
   trackingOptions: {
     maximumAge: 10000,
     enableHighAccuracy: true,
     timeout: 600000
   }
-}));
+});
 
 var deltaMean = 500; // the geolocation sampling period mean in ms
 
@@ -214,9 +214,7 @@ function simulatePositionChange(position) {
   var coords = position.coords;
   geolocation.set('accuracy', coords.accuracy);
   geolocation.set('heading', degToRad(coords.heading));
-  var position_ = [coords.longitude, coords.latitude];
-  var projectedPosition = ol.proj.transform(position_, 'EPSG:4326',
-      'EPSG:3857');
+  var projectedPosition = fromLonLat([coords.longitude, coords.latitude]);
   geolocation.set('position', projectedPosition);
   geolocation.set('speed', coords.speed);
   geolocation.changed();

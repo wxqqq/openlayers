@@ -1,17 +1,17 @@
-goog.require('ol.Map');
-goog.require('ol.View');
-goog.require('ol.control');
-goog.require('ol.extent');
-goog.require('ol.layer.Tile');
-goog.require('ol.proj');
-goog.require('ol.source.OSM');
-goog.require('ol.source.WMTS');
-goog.require('ol.tilegrid.WMTS');
+import Map from '../src/ol/Map.js';
+import _ol_View_ from '../src/ol/View.js';
+import {defaults as defaultControls} from '../src/ol/control.js';
+import * as _ol_extent_ from '../src/ol/extent.js';
+import TileLayer from '../src/ol/layer/Tile.js';
+import {get as getProjection} from '../src/ol/proj.js';
+import _ol_source_OSM_ from '../src/ol/source/OSM.js';
+import _ol_source_WMTS_ from '../src/ol/source/WMTS.js';
+import WMTSTileGrid from '../src/ol/tilegrid/WMTS.js';
 
 
-var projection = ol.proj.get('EPSG:3857');
+var projection = getProjection('EPSG:3857');
 var projectionExtent = projection.getExtent();
-var size = ol.extent.getWidth(projectionExtent) / 256;
+var size = _ol_extent_.getWidth(projectionExtent) / 256;
 var resolutions = new Array(14);
 var matrixIds = new Array(14);
 for (var z = 0; z < 14; ++z) {
@@ -20,15 +20,15 @@ for (var z = 0; z < 14; ++z) {
   matrixIds[z] = z;
 }
 
-var map = new ol.Map({
+var map = new Map({
   layers: [
-    new ol.layer.Tile({
-      source: new ol.source.OSM(),
+    new TileLayer({
+      source: new _ol_source_OSM_(),
       opacity: 0.7
     }),
-    new ol.layer.Tile({
+    new TileLayer({
       opacity: 0.7,
-      source: new ol.source.WMTS({
+      source: new _ol_source_WMTS_({
         attributions: 'Tiles © <a href="https://services.arcgisonline.com/arcgis/rest/' +
             'services/Demographics/USA_Population_Density/MapServer/">ArcGIS</a>',
         url: 'https://services.arcgisonline.com/arcgis/rest/' +
@@ -37,8 +37,8 @@ var map = new ol.Map({
         matrixSet: 'EPSG:3857',
         format: 'image/png',
         projection: projection,
-        tileGrid: new ol.tilegrid.WMTS({
-          origin: ol.extent.getTopLeft(projectionExtent),
+        tileGrid: new WMTSTileGrid({
+          origin: _ol_extent_.getTopLeft(projectionExtent),
           resolutions: resolutions,
           matrixIds: matrixIds
         }),
@@ -48,12 +48,12 @@ var map = new ol.Map({
     })
   ],
   target: 'map',
-  controls: ol.control.defaults({
-    attributionOptions: /** @type {olx.control.AttributionOptions} */ ({
+  controls: defaultControls({
+    attributionOptions: {
       collapsible: false
-    })
+    }
   }),
-  view: new ol.View({
+  view: new _ol_View_({
     center: [-11158582, 4813697],
     zoom: 4
   })

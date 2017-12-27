@@ -1,59 +1,59 @@
-goog.require('ol.Map');
-goog.require('ol.View');
-goog.require('ol.control');
-goog.require('ol.format.GeoJSON');
-goog.require('ol.layer.Tile');
-goog.require('ol.layer.Vector');
-goog.require('ol.source.OSM');
-goog.require('ol.source.Vector');
-goog.require('ol.style.Circle');
-goog.require('ol.style.Fill');
-goog.require('ol.style.Stroke');
-goog.require('ol.style.Style');
+import Map from '../src/ol/Map.js';
+import _ol_View_ from '../src/ol/View.js';
+import {defaults as defaultControls} from '../src/ol/control.js';
+import GeoJSON from '../src/ol/format/GeoJSON.js';
+import TileLayer from '../src/ol/layer/Tile.js';
+import _ol_layer_Vector_ from '../src/ol/layer/Vector.js';
+import _ol_source_OSM_ from '../src/ol/source/OSM.js';
+import _ol_source_Vector_ from '../src/ol/source/Vector.js';
+import _ol_style_Circle_ from '../src/ol/style/Circle.js';
+import _ol_style_Fill_ from '../src/ol/style/Fill.js';
+import _ol_style_Stroke_ from '../src/ol/style/Stroke.js';
+import _ol_style_Style_ from '../src/ol/style/Style.js';
 
-var source = new ol.source.Vector({
+var source = new _ol_source_Vector_({
   url: 'data/geojson/switzerland.geojson',
-  format: new ol.format.GeoJSON()
+  format: new GeoJSON()
 });
-var style = new ol.style.Style({
-  fill: new ol.style.Fill({
+var style = new _ol_style_Style_({
+  fill: new _ol_style_Fill_({
     color: 'rgba(255, 255, 255, 0.6)'
   }),
-  stroke: new ol.style.Stroke({
+  stroke: new _ol_style_Stroke_({
     color: '#319FD3',
     width: 1
   }),
-  image: new ol.style.Circle({
+  image: new _ol_style_Circle_({
     radius: 5,
-    fill: new ol.style.Fill({
+    fill: new _ol_style_Fill_({
       color: 'rgba(255, 255, 255, 0.6)'
     }),
-    stroke: new ol.style.Stroke({
+    stroke: new _ol_style_Stroke_({
       color: '#319FD3',
       width: 1
     })
   })
 });
-var vectorLayer = new ol.layer.Vector({
+var vectorLayer = new _ol_layer_Vector_({
   source: source,
   style: style
 });
-var view = new ol.View({
+var view = new _ol_View_({
   center: [0, 0],
   zoom: 1
 });
-var map = new ol.Map({
+var map = new Map({
   layers: [
-    new ol.layer.Tile({
-      source: new ol.source.OSM()
+    new TileLayer({
+      source: new _ol_source_OSM_()
     }),
     vectorLayer
   ],
   target: 'map',
-  controls: ol.control.defaults({
-    attributionOptions: /** @type {olx.control.AttributionOptions} */ ({
+  controls: defaultControls({
+    attributionOptions: {
       collapsible: false
-    })
+    }
   }),
   view: view
 });

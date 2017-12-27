@@ -1,26 +1,26 @@
-goog.require('ol.Map');
-goog.require('ol.View');
-goog.require('ol.has');
-goog.require('ol.layer.Tile');
-goog.require('ol.source.OSM');
+import Map from '../src/ol/Map.js';
+import _ol_View_ from '../src/ol/View.js';
+import _ol_has_ from '../src/ol/has.js';
+import TileLayer from '../src/ol/layer/Tile.js';
+import _ol_source_OSM_ from '../src/ol/source/OSM.js';
 
-var layer = new ol.layer.Tile({
-  source: new ol.source.OSM()
+var layer = new TileLayer({
+  source: new _ol_source_OSM_()
 });
 
-var view = new ol.View({
+var view = new _ol_View_({
   center: [0, 0],
   zoom: 1
 });
 
-var map1 = new ol.Map({
+var map1 = new Map({
   target: 'canvasMap',
   layers: [layer],
   view: view
 });
 
-if (ol.has.WEBGL) {
-  var map2 = new ol.Map({
+if (_ol_has_.WEBGL) {
+  var map2 = new Map({
     target: 'webglMap',
     renderer: /** @type {Array<ol.renderer.Type>} */ (['webgl', 'canvas']),
     layers: [layer],

@@ -1,20 +1,20 @@
-goog.require('ol');
-goog.require('ol.Feature');
-goog.require('ol.Map');
-goog.require('ol.View');
-goog.require('ol.geom.LineString');
-goog.require('ol.geom.Point');
-goog.require('ol.geom.Polygon');
-goog.require('ol.interaction');
-goog.require('ol.interaction.Pointer');
-goog.require('ol.layer.Tile');
-goog.require('ol.layer.Vector');
-goog.require('ol.source.TileJSON');
-goog.require('ol.source.Vector');
-goog.require('ol.style.Fill');
-goog.require('ol.style.Icon');
-goog.require('ol.style.Stroke');
-goog.require('ol.style.Style');
+import {inherits} from '../src/ol/index.js';
+import _ol_Feature_ from '../src/ol/Feature.js';
+import Map from '../src/ol/Map.js';
+import _ol_View_ from '../src/ol/View.js';
+import LineString from '../src/ol/geom/LineString.js';
+import Point from '../src/ol/geom/Point.js';
+import Polygon from '../src/ol/geom/Polygon.js';
+import {defaults as defaultInteractions} from '../src/ol/interaction.js';
+import _ol_interaction_Pointer_ from '../src/ol/interaction/Pointer.js';
+import TileLayer from '../src/ol/layer/Tile.js';
+import _ol_layer_Vector_ from '../src/ol/layer/Vector.js';
+import _ol_source_TileJSON_ from '../src/ol/source/TileJSON.js';
+import _ol_source_Vector_ from '../src/ol/source/Vector.js';
+import _ol_style_Fill_ from '../src/ol/style/Fill.js';
+import _ol_style_Icon_ from '../src/ol/style/Icon.js';
+import _ol_style_Stroke_ from '../src/ol/style/Stroke.js';
+import _ol_style_Style_ from '../src/ol/style/Style.js';
 
 
 /**
@@ -29,7 +29,7 @@ var app = {};
  */
 app.Drag = function() {
 
-  ol.interaction.Pointer.call(this, {
+  _ol_interaction_Pointer_.call(this, {
     handleDownEvent: app.Drag.prototype.handleDownEvent,
     handleDragEvent: app.Drag.prototype.handleDragEvent,
     handleMoveEvent: app.Drag.prototype.handleMoveEvent,
@@ -61,7 +61,7 @@ app.Drag = function() {
   this.previousCursor_ = undefined;
 
 };
-ol.inherits(app.Drag, ol.interaction.Pointer);
+inherits(app.Drag, _ol_interaction_Pointer_);
 
 
 /**
@@ -92,8 +92,7 @@ app.Drag.prototype.handleDragEvent = function(evt) {
   var deltaX = evt.coordinate[0] - this.coordinate_[0];
   var deltaY = evt.coordinate[1] - this.coordinate_[1];
 
-  var geometry = /** @type {ol.geom.SimpleGeometry} */
-      (this.feature_.getGeometry());
+  var geometry = this.feature_.getGeometry();
   geometry.translate(deltaX, deltaY);
 
   this.coordinate_[0] = evt.coordinate[0];
@@ -135,48 +134,48 @@ app.Drag.prototype.handleUpEvent = function() {
 };
 
 
-var pointFeature = new ol.Feature(new ol.geom.Point([0, 0]));
+var pointFeature = new _ol_Feature_(new Point([0, 0]));
 
-var lineFeature = new ol.Feature(
-    new ol.geom.LineString([[-1e7, 1e6], [-1e6, 3e6]]));
+var lineFeature = new _ol_Feature_(
+    new LineString([[-1e7, 1e6], [-1e6, 3e6]]));
 
-var polygonFeature = new ol.Feature(
-    new ol.geom.Polygon([[[-3e6, -1e6], [-3e6, 1e6],
+var polygonFeature = new _ol_Feature_(
+    new Polygon([[[-3e6, -1e6], [-3e6, 1e6],
       [-1e6, 1e6], [-1e6, -1e6], [-3e6, -1e6]]]));
 
 
-var map = new ol.Map({
-  interactions: ol.interaction.defaults().extend([new app.Drag()]),
+var map = new Map({
+  interactions: defaultInteractions().extend([new app.Drag()]),
   layers: [
-    new ol.layer.Tile({
-      source: new ol.source.TileJSON({
+    new TileLayer({
+      source: new _ol_source_TileJSON_({
         url: 'https://api.tiles.mapbox.com/v3/mapbox.geography-class.json?secure'
       })
     }),
-    new ol.layer.Vector({
-      source: new ol.source.Vector({
+    new _ol_layer_Vector_({
+      source: new _ol_source_Vector_({
         features: [pointFeature, lineFeature, polygonFeature]
       }),
-      style: new ol.style.Style({
-        image: new ol.style.Icon(/** @type {olx.style.IconOptions} */ ({
+      style: new _ol_style_Style_({
+        image: new _ol_style_Icon_(/** @type {olx.style.IconOptions} */ ({
           anchor: [0.5, 46],
           anchorXUnits: 'fraction',
           anchorYUnits: 'pixels',
           opacity: 0.95,
           src: 'data/icon.png'
         })),
-        stroke: new ol.style.Stroke({
+        stroke: new _ol_style_Stroke_({
           width: 3,
           color: [255, 0, 0, 1]
         }),
-        fill: new ol.style.Fill({
+        fill: new _ol_style_Fill_({
           color: [0, 0, 255, 0.6]
         })
       })
     })
   ],
   target: 'map',
-  view: new ol.View({
+  view: new _ol_View_({
     center: [0, 0],
     zoom: 2
   })

@@ -1,32 +1,32 @@
-goog.require('ol.Map');
-goog.require('ol.Overlay');
-goog.require('ol.View');
-goog.require('ol.layer.Tile');
-goog.require('ol.source.TileJSON');
-goog.require('ol.source.TileUTFGrid');
+import Map from '../src/ol/Map.js';
+import _ol_Overlay_ from '../src/ol/Overlay.js';
+import _ol_View_ from '../src/ol/View.js';
+import TileLayer from '../src/ol/layer/Tile.js';
+import _ol_source_TileJSON_ from '../src/ol/source/TileJSON.js';
+import _ol_source_TileUTFGrid_ from '../src/ol/source/TileUTFGrid.js';
 
 var key = 'pk.eyJ1IjoiYWhvY2V2YXIiLCJhIjoiRk1kMWZaSSJ9.E5BkluenyWQMsBLsuByrmg';
 
-var mapLayer = new ol.layer.Tile({
-  source: new ol.source.TileJSON({
+var mapLayer = new TileLayer({
+  source: new _ol_source_TileJSON_({
     url: 'https://api.tiles.mapbox.com/v4/mapbox.geography-class.json?secure&access_token=' + key
   })
 });
 
 
-var gridSource = new ol.source.TileUTFGrid({
+var gridSource = new _ol_source_TileUTFGrid_({
   url: 'https://api.tiles.mapbox.com/v4/mapbox.geography-class.json?secure&access_token=' + key
 });
 
-var gridLayer = new ol.layer.Tile({source: gridSource});
+var gridLayer = new TileLayer({source: gridSource});
 
-var view = new ol.View({
+var view = new _ol_View_({
   center: [0, 0],
   zoom: 1
 });
 
 var mapElement = document.getElementById('map');
-var map = new ol.Map({
+var map = new Map({
   layers: [mapLayer, gridLayer],
   target: mapElement,
   view: view
@@ -36,7 +36,7 @@ var infoElement = document.getElementById('country-info');
 var flagElement = document.getElementById('country-flag');
 var nameElement = document.getElementById('country-name');
 
-var infoOverlay = new ol.Overlay({
+var infoOverlay = new _ol_Overlay_({
   element: infoElement,
   offset: [15, 15],
   stopEvent: false

@@ -1,28 +1,28 @@
-goog.require('ol.Map');
-goog.require('ol.View');
-goog.require('ol.control');
-goog.require('ol.control.ScaleLine');
-goog.require('ol.layer.Tile');
-goog.require('ol.source.OSM');
+import Map from '../src/ol/Map.js';
+import _ol_View_ from '../src/ol/View.js';
+import {defaults as defaultControls} from '../src/ol/control.js';
+import ScaleLine from '../src/ol/control/ScaleLine.js';
+import TileLayer from '../src/ol/layer/Tile.js';
+import _ol_source_OSM_ from '../src/ol/source/OSM.js';
 
 
-var scaleLineControl = new ol.control.ScaleLine();
+var scaleLineControl = new ScaleLine();
 
-var map = new ol.Map({
-  controls: ol.control.defaults({
-    attributionOptions: /** @type {olx.control.AttributionOptions} */ ({
+var map = new Map({
+  controls: defaultControls({
+    attributionOptions: {
       collapsible: false
-    })
+    }
   }).extend([
     scaleLineControl
   ]),
   layers: [
-    new ol.layer.Tile({
-      source: new ol.source.OSM()
+    new TileLayer({
+      source: new _ol_source_OSM_()
     })
   ],
   target: 'map',
-  view: new ol.View({
+  view: new _ol_View_({
     center: [0, 0],
     zoom: 2
   })

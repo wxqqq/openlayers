@@ -1,8 +1,8 @@
-goog.require('ol.Map');
-goog.require('ol.View');
-goog.require('ol.control.ZoomSlider');
-goog.require('ol.layer.Tile');
-goog.require('ol.source.OSM');
+import Map from '../src/ol/Map.js';
+import _ol_View_ from '../src/ol/View.js';
+import ZoomSlider from '../src/ol/control/ZoomSlider.js';
+import TileLayer from '../src/ol/layer/Tile.js';
+import _ol_source_OSM_ from '../src/ol/source/OSM.js';
 
 
 /**
@@ -14,19 +14,19 @@ goog.require('ol.source.OSM');
 var createMap = function(divId) {
   var source, layer, map, zoomslider;
 
-  source = new ol.source.OSM();
-  layer = new ol.layer.Tile({
+  source = new _ol_source_OSM_();
+  layer = new TileLayer({
     source: source
   });
-  map = new ol.Map({
+  map = new Map({
     layers: [layer],
     target: divId,
-    view: new ol.View({
+    view: new _ol_View_({
       center: [0, 0],
       zoom: 2
     })
   });
-  zoomslider = new ol.control.ZoomSlider();
+  zoomslider = new ZoomSlider();
   map.addControl(zoomslider);
   return map;
 };

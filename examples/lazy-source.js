@@ -1,16 +1,16 @@
-goog.require('ol.Map');
-goog.require('ol.View');
-goog.require('ol.layer.Tile');
-goog.require('ol.source.OSM');
+import Map from '../src/ol/Map.js';
+import _ol_View_ from '../src/ol/View.js';
+import TileLayer from '../src/ol/layer/Tile.js';
+import _ol_source_OSM_ from '../src/ol/source/OSM.js';
 
-var source = new ol.source.OSM();
+var source = new _ol_source_OSM_();
 
-var layer = new ol.layer.Tile();
+var layer = new TileLayer();
 
-var map = new ol.Map({
+var map = new Map({
   layers: [layer],
   target: 'map',
-  view: new ol.View({
+  view: new _ol_View_({
     center: [0, 0],
     zoom: 2
   })

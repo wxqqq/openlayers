@@ -1,40 +1,40 @@
-goog.require('ol.Map');
-goog.require('ol.View');
-goog.require('ol.format.GeoJSON');
-goog.require('ol.interaction');
-goog.require('ol.interaction.Modify');
-goog.require('ol.interaction.Select');
-goog.require('ol.layer.Tile');
-goog.require('ol.layer.Vector');
-goog.require('ol.source.OSM');
-goog.require('ol.source.Vector');
+import Map from '../src/ol/Map.js';
+import _ol_View_ from '../src/ol/View.js';
+import GeoJSON from '../src/ol/format/GeoJSON.js';
+import {defaults as defaultInteractions} from '../src/ol/interaction.js';
+import _ol_interaction_Modify_ from '../src/ol/interaction/Modify.js';
+import _ol_interaction_Select_ from '../src/ol/interaction/Select.js';
+import TileLayer from '../src/ol/layer/Tile.js';
+import _ol_layer_Vector_ from '../src/ol/layer/Vector.js';
+import _ol_source_OSM_ from '../src/ol/source/OSM.js';
+import _ol_source_Vector_ from '../src/ol/source/Vector.js';
 
 
-var raster = new ol.layer.Tile({
-  source: new ol.source.OSM()
+var raster = new TileLayer({
+  source: new _ol_source_OSM_()
 });
 
-var vector = new ol.layer.Vector({
-  source: new ol.source.Vector({
+var vector = new _ol_layer_Vector_({
+  source: new _ol_source_Vector_({
     url: 'data/geojson/countries.geojson',
-    format: new ol.format.GeoJSON(),
+    format: new GeoJSON(),
     wrapX: false
   })
 });
 
-var select = new ol.interaction.Select({
+var select = new _ol_interaction_Select_({
   wrapX: false
 });
 
-var modify = new ol.interaction.Modify({
+var modify = new _ol_interaction_Modify_({
   features: select.getFeatures()
 });
 
-var map = new ol.Map({
-  interactions: ol.interaction.defaults().extend([select, modify]),
+var map = new Map({
+  interactions: defaultInteractions().extend([select, modify]),
   layers: [raster, vector],
   target: 'map',
-  view: new ol.View({
+  view: new _ol_View_({
     center: [0, 0],
     zoom: 2
   })

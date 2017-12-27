@@ -1,11 +1,11 @@
 // NOCOMPILE
 // this example uses d3 for which we don't have an externs file.
-goog.require('ol.Map');
-goog.require('ol.View');
-goog.require('ol.layer.Image');
-goog.require('ol.layer.Tile');
-goog.require('ol.source.BingMaps');
-goog.require('ol.source.Raster');
+import Map from '../src/ol/Map.js';
+import _ol_View_ from '../src/ol/View.js';
+import _ol_layer_Image_ from '../src/ol/layer/Image.js';
+import TileLayer from '../src/ol/layer/Tile.js';
+import _ol_source_BingMaps_ from '../src/ol/source/BingMaps.js';
+import RasterSource from '../src/ol/source/Raster.js';
 
 var minVgi = 0;
 var maxVgi = 0.25;
@@ -49,7 +49,7 @@ function summarize(value, counts) {
 /**
  * Use aerial imagery as the input data for the raster source.
  */
-var bing = new ol.source.BingMaps({
+var bing = new _ol_source_BingMaps_({
   key: 'As1HiMj1PvLPlqc_gtM7AqZfBL8ZL3VrjaS3zIb22Uvb9WKhuJObROC-qUpa81U5',
   imagerySet: 'Aerial'
 });
@@ -59,7 +59,7 @@ var bing = new ol.source.BingMaps({
  * Create a raster source where pixels with VGI values above a threshold will
  * be colored green.
  */
-var raster = new ol.source.Raster({
+var raster = new RasterSource({
   sources: [bing],
   /**
    * Run calculations on pixel data.
@@ -110,17 +110,17 @@ raster.on('afteroperations', function(event) {
   schedulePlot(event.resolution, event.data.counts, event.data.threshold);
 });
 
-var map = new ol.Map({
+var map = new Map({
   layers: [
-    new ol.layer.Tile({
+    new TileLayer({
       source: bing
     }),
-    new ol.layer.Image({
+    new _ol_layer_Image_({
       source: raster
     })
   ],
   target: 'map',
-  view: new ol.View({
+  view: new _ol_View_({
     center: [-9651695, 4937351],
     zoom: 13,
     minZoom: 12,
@@ -144,13 +144,13 @@ var chart = d3.select('#plot').append('svg')
     .attr('width', barWidth * bins)
     .attr('height', plotHeight);
 
-var chartRect = chart[0][0].getBoundingClientRect();
+var chartRect = chart.node().getBoundingClientRect();
 
 var tip = d3.select(document.body).append('div')
     .attr('class', 'tip');
 
 function plot(resolution, counts, threshold) {
-  var yScale = d3.scale.linear()
+  var yScale = d3.scaleLinear()
       .domain([0, d3.max(counts.values)])
       .range([0, plotHeight]);
 

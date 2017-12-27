@@ -1,39 +1,39 @@
-goog.require('ol.Feature');
-goog.require('ol.Geolocation');
-goog.require('ol.Map');
-goog.require('ol.View');
-goog.require('ol.control');
-goog.require('ol.geom.Point');
-goog.require('ol.layer.Tile');
-goog.require('ol.layer.Vector');
-goog.require('ol.source.OSM');
-goog.require('ol.source.Vector');
-goog.require('ol.style.Circle');
-goog.require('ol.style.Fill');
-goog.require('ol.style.Stroke');
-goog.require('ol.style.Style');
+import _ol_Feature_ from '../src/ol/Feature.js';
+import Geolocation from '../src/ol/Geolocation.js';
+import Map from '../src/ol/Map.js';
+import _ol_View_ from '../src/ol/View.js';
+import {defaults as defaultControls} from '../src/ol/control.js';
+import Point from '../src/ol/geom/Point.js';
+import TileLayer from '../src/ol/layer/Tile.js';
+import _ol_layer_Vector_ from '../src/ol/layer/Vector.js';
+import _ol_source_OSM_ from '../src/ol/source/OSM.js';
+import _ol_source_Vector_ from '../src/ol/source/Vector.js';
+import _ol_style_Circle_ from '../src/ol/style/Circle.js';
+import _ol_style_Fill_ from '../src/ol/style/Fill.js';
+import _ol_style_Stroke_ from '../src/ol/style/Stroke.js';
+import _ol_style_Style_ from '../src/ol/style/Style.js';
 
-var view = new ol.View({
+var view = new _ol_View_({
   center: [0, 0],
   zoom: 2
 });
 
-var map = new ol.Map({
+var map = new Map({
   layers: [
-    new ol.layer.Tile({
-      source: new ol.source.OSM()
+    new TileLayer({
+      source: new _ol_source_OSM_()
     })
   ],
   target: 'map',
-  controls: ol.control.defaults({
-    attributionOptions: /** @type {olx.control.AttributionOptions} */ ({
+  controls: defaultControls({
+    attributionOptions: {
       collapsible: false
-    })
+    }
   }),
   view: view
 });
 
-var geolocation = new ol.Geolocation({
+var geolocation = new Geolocation({
   projection: view.getProjection()
 });
 
@@ -61,19 +61,19 @@ geolocation.on('error', function(error) {
   info.style.display = '';
 });
 
-var accuracyFeature = new ol.Feature();
+var accuracyFeature = new _ol_Feature_();
 geolocation.on('change:accuracyGeometry', function() {
   accuracyFeature.setGeometry(geolocation.getAccuracyGeometry());
 });
 
-var positionFeature = new ol.Feature();
-positionFeature.setStyle(new ol.style.Style({
-  image: new ol.style.Circle({
+var positionFeature = new _ol_Feature_();
+positionFeature.setStyle(new _ol_style_Style_({
+  image: new _ol_style_Circle_({
     radius: 6,
-    fill: new ol.style.Fill({
+    fill: new _ol_style_Fill_({
       color: '#3399CC'
     }),
-    stroke: new ol.style.Stroke({
+    stroke: new _ol_style_Stroke_({
       color: '#fff',
       width: 2
     })
@@ -83,12 +83,12 @@ positionFeature.setStyle(new ol.style.Style({
 geolocation.on('change:position', function() {
   var coordinates = geolocation.getPosition();
   positionFeature.setGeometry(coordinates ?
-    new ol.geom.Point(coordinates) : null);
+    new Point(coordinates) : null);
 });
 
-new ol.layer.Vector({
+new _ol_layer_Vector_({
   map: map,
-  source: new ol.source.Vector({
+  source: new _ol_source_Vector_({
     features: [accuracyFeature, positionFeature]
   })
 });

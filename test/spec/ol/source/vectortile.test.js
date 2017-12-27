@@ -1,19 +1,18 @@
-goog.require('ol.Map');
-goog.require('ol.View');
-goog.require('ol.VectorImageTile');
-goog.require('ol.VectorTile');
-goog.require('ol.format.MVT');
-goog.require('ol.layer.VectorTile');
-goog.require('ol.proj');
-goog.require('ol.proj.Projection');
-goog.require('ol.source.VectorTile');
-goog.require('ol.tilegrid');
-goog.require('ol.tilegrid.TileGrid');
+import Map from '../../../../src/ol/Map.js';
+import _ol_View_ from '../../../../src/ol/View.js';
+import VectorImageTile from '../../../../src/ol/VectorImageTile.js';
+import VectorTile from '../../../../src/ol/VectorTile.js';
+import MVT from '../../../../src/ol/format/MVT.js';
+import _ol_layer_VectorTile_ from '../../../../src/ol/layer/VectorTile.js';
+import {get as getProjection} from '../../../../src/ol/proj.js';
+import _ol_source_VectorTile_ from '../../../../src/ol/source/VectorTile.js';
+import _ol_tilegrid_ from '../../../../src/ol/tilegrid.js';
+import TileGrid from '../../../../src/ol/tilegrid/TileGrid.js';
 
 describe('ol.source.VectorTile', function() {
 
-  var format = new ol.format.MVT();
-  var source = new ol.source.VectorTile({
+  var format = new MVT();
+  var source = new _ol_source_VectorTile_({
     format: format,
     tilePixelRatio: 8,
     url: 'spec/ol/data/{z}-{x}-{y}.vector.pbf'
@@ -26,11 +25,11 @@ describe('ol.source.VectorTile', function() {
     });
 
     it('uses ol.VectorTile as default tileClass', function() {
-      expect(source.tileClass).to.equal(ol.VectorTile);
+      expect(source.tileClass).to.equal(VectorTile);
     });
 
     it('creates a 512 XYZ tilegrid by default', function() {
-      var tileGrid = ol.tilegrid.createXYZ({tileSize: 512});
+      var tileGrid = _ol_tilegrid_.createXYZ({tileSize: 512});
       expect(source.tileGrid.tileSize_).to.equal(tileGrid.tileSize_);
       expect(source.tileGrid.extent_).to.equal(tileGrid.extent_);
     });
@@ -38,35 +37,35 @@ describe('ol.source.VectorTile', function() {
 
   describe('#getTile()', function() {
     it('creates a tile with the correct tile class', function() {
-      tile = source.getTile(0, 0, 0, 1, ol.proj.get('EPSG:3857'));
-      expect(tile).to.be.a(ol.VectorImageTile);
+      tile = source.getTile(0, 0, 0, 1, getProjection('EPSG:3857'));
+      expect(tile).to.be.a(VectorImageTile);
     });
     it('sets the correct tileCoord on the created tile', function() {
       expect(tile.getTileCoord()).to.eql([0, 0, 0]);
     });
     it('fetches tile from cache when requested again', function() {
-      expect(source.getTile(0, 0, 0, 1, ol.proj.get('EPSG:3857')))
+      expect(source.getTile(0, 0, 0, 1, getProjection('EPSG:3857')))
           .to.equal(tile);
     });
   });
 
   describe('#getTileGridForProjection', function() {
     it('creates a tile grid with the source tile grid\'s tile size', function() {
-      var tileGrid = source.getTileGridForProjection(ol.proj.get('EPSG:3857'));
+      var tileGrid = source.getTileGridForProjection(getProjection('EPSG:3857'));
       expect(tileGrid.getTileSize(0)).to.be(512);
     });
   });
 
   describe('Tile load events', function() {
     it('triggers tileloadstart and tileloadend with ol.VectorTile', function(done) {
-      tile = source.getTile(14, 8938, -5681, 1, ol.proj.get('EPSG:3857'));
+      tile = source.getTile(14, 8938, -5681, 1, getProjection('EPSG:3857'));
       var started = false;
       source.on('tileloadstart', function() {
         started = true;
       });
       source.on('tileloadend', function(e) {
         expect(started).to.be(true);
-        expect(e.tile).to.be.a(ol.VectorTile);
+        expect(e.tile).to.be.a(VectorTile);
         expect(e.tile.getFeatures().length).to.be(1327);
         done();
       });
@@ -95,16 +94,10 @@ describe('ol.source.VectorTile', function() {
         loaded.push(src);
       }
 
-      var proj = ol.proj.Projection({
-        code: 'EPSG:3006',
-        units: 'm'
-      });
-
       var extent = [665584.2026596286, 7033250.839875697, 667162.0221431496, 7035280.378636755];
 
-      source = new ol.source.VectorTile({
-        projection: proj,
-        tileGrid: new ol.tilegrid.TileGrid({
+      source = new _ol_source_VectorTile_({
+        tileGrid: new TileGrid({
           origin: [218128, 6126002],
           resolutions: [4096, 2048, 1024, 512, 256, 128, 64, 32, 16, 8, 4, 2, 1, 0.5]
         }),
@@ -116,17 +109,15 @@ describe('ol.source.VectorTile', function() {
       target.style.width = target.style.height = '100px';
       document.body.appendChild(target);
 
-      map = new ol.Map({
+      map = new Map({
         layers: [
-          new ol.layer.VectorTile({
-            visible: true,
+          new _ol_layer_VectorTile_({
             extent: extent,
             source: source
           })
         ],
         target: target,
-        view: new ol.View({
-          projection: proj,
+        view: new _ol_View_({
           zoom: 11,
           center: [666373.1624999996, 7034265.3572]
         })

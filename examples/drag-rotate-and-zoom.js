@@ -1,22 +1,22 @@
-goog.require('ol.Map');
-goog.require('ol.View');
-goog.require('ol.interaction');
-goog.require('ol.interaction.DragRotateAndZoom');
-goog.require('ol.layer.Tile');
-goog.require('ol.source.OSM');
+import Map from '../src/ol/Map.js';
+import _ol_View_ from '../src/ol/View.js';
+import {defaults as defaultInteractions} from '../src/ol/interaction.js';
+import DragRotateAndZoom from '../src/ol/interaction/DragRotateAndZoom.js';
+import TileLayer from '../src/ol/layer/Tile.js';
+import _ol_source_OSM_ from '../src/ol/source/OSM.js';
 
 
-var map = new ol.Map({
-  interactions: ol.interaction.defaults().extend([
-    new ol.interaction.DragRotateAndZoom()
+var map = new Map({
+  interactions: defaultInteractions().extend([
+    new DragRotateAndZoom()
   ]),
   layers: [
-    new ol.layer.Tile({
-      source: new ol.source.OSM()
+    new TileLayer({
+      source: new _ol_source_OSM_()
     })
   ],
   target: 'map',
-  view: new ol.View({
+  view: new _ol_View_({
     center: [0, 0],
     zoom: 2
   })

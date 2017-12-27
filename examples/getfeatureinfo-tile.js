@@ -1,26 +1,26 @@
-goog.require('ol.Map');
-goog.require('ol.View');
-goog.require('ol.layer.Tile');
-goog.require('ol.source.TileWMS');
+import Map from '../src/ol/Map.js';
+import _ol_View_ from '../src/ol/View.js';
+import TileLayer from '../src/ol/layer/Tile.js';
+import _ol_source_TileWMS_ from '../src/ol/source/TileWMS.js';
 
 
-var wmsSource = new ol.source.TileWMS({
+var wmsSource = new _ol_source_TileWMS_({
   url: 'https://ahocevar.com/geoserver/wms',
   params: {'LAYERS': 'ne:ne', 'TILED': true},
   serverType: 'geoserver',
   crossOrigin: 'anonymous'
 });
 
-var wmsLayer = new ol.layer.Tile({
+var wmsLayer = new TileLayer({
   source: wmsSource
 });
 
-var view = new ol.View({
+var view = new _ol_View_({
   center: [0, 0],
   zoom: 1
 });
 
-var map = new ol.Map({
+var map = new Map({
   layers: [wmsLayer],
   target: 'map',
   view: view

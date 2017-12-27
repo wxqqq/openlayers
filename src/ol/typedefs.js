@@ -1,3 +1,30 @@
+/**
+ * @module ol/typedefs
+ */
+/* eslint-disable openlayers-internal/no-missing-requires */
+
+/**
+ * File for all typedefs used by the compiler, and referenced by JSDoc.
+ *
+ * These look like vars (or var properties), but in fact are simply identifiers
+ * for the Closure compiler. Originally they were included in the appropriate
+ * namespace file, but with the move away from Closure namespaces and towards
+ * self-contained standard modules are now all in this file.
+ * Unlike the other type definitions - enums and constructor functions - they
+ * are not code and so are not imported or exported. They are only referred to
+ * in type-defining comments used by the Closure compiler, and so should not
+ * appear in module code.
+ *
+ * They are now all in the `ol` namespace.
+ */
+
+
+/**
+ * @typedef {{x: number, y: number, width: number, height: number}}
+ */
+/**
+ * @module ol/typedefs
+ */
 /* eslint-disable openlayers-internal/no-missing-requires */
 
 /**
@@ -48,10 +75,9 @@ ol.AtlasManagerInfo;
  * It represents either
  * * a simple string (e.g. `'© Acme Inc.'`)
  * * an array of simple strings (e.g. `['© Acme Inc.', '© Bacme Inc.']`)
- * * a function that returns a string or array of strings (`{@link ol.Attribution2}`)
+ * * a function that returns a string or array of strings (`{@link ol.Attribution}`)
  *
- * Note that the `{@link ol.Attribution}` constructor is deprecated.
- * @typedef {string|Array.<string>|ol.Attribution2|ol.Attribution|Array.<ol.Attribution>}
+ * @typedef {string|Array.<string>|ol.Attribution}
  */
 ol.AttributionLike;
 
@@ -62,7 +88,7 @@ ol.AttributionLike;
  *
  * @typedef {function(olx.FrameState): (string|Array.<string>)}
  */
-ol.Attribution2;
+ol.Attribution;
 
 
 /**
@@ -84,6 +110,28 @@ ol.CanvasFillState;
  *     number, ol.Size, ol.proj.Projection): HTMLCanvasElement}
  */
 ol.CanvasFunctionType;
+
+
+/**
+ * @typedef {{currentFillStyle: (ol.ColorLike|undefined),
+ *            currentStrokeStyle: (ol.ColorLike|undefined),
+ *            currentLineCap: (string|undefined),
+ *            currentLineDash: Array.<number>,
+ *            currentLineDashOffset: (number|undefined),
+ *            currentLineJoin: (string|undefined),
+ *            currentLineWidth: (number|undefined),
+ *            currentMiterLimit: (number|undefined),
+ *            lastStroke: (number|undefined),
+ *            fillStyle: (ol.ColorLike|undefined),
+ *            strokeStyle: (ol.ColorLike|undefined),
+ *            lineCap: (string|undefined),
+ *            lineDash: Array.<number>,
+ *            lineDashOffset: (number|undefined),
+ *            lineJoin: (string|undefined),
+ *            lineWidth: (number|undefined),
+ *            miterLimit: (number|undefined)}|null}
+ */
+ol.CanvasFillStrokeState;
 
 
 /**
@@ -165,6 +213,20 @@ ol.Coordinate;
  * @typedef {function((ol.Coordinate|undefined)): string}
  */
 ol.CoordinateFormatType;
+
+
+/**
+ * Container for decluttered replay instructions that need to be rendered or
+ * omitted together, i.e. when styles render both an image and text, or for the
+ * characters that form text along lines. The basic elements of this array are
+ * `[minX, minY, maxX, maxY, count]`, where the first four entries are the
+ * rendered extent of the group in pixel space. `count` is the number of styles
+ * in the group, i.e. 2 when an image and a text are grouped, or 1 otherwise.
+ * In addition to these four elements, declutter instruction arrays (i.e. the
+ * arguments to @{link ol.render.canvas.drawImage} are appended to the array.
+ * @typedef {Array.<*>}
+ */
+ol.DeclutterGroup;
 
 
 /**
@@ -378,7 +440,6 @@ ol.LRUCacheEntry;
  * @typedef {{controls: (ol.Collection.<ol.control.Control>|undefined),
  *            interactions: (ol.Collection.<ol.interaction.Interaction>|undefined),
  *            keyboardEventTarget: (Element|Document),
- *            logos: (Object.<string, (string|Element)>),
  *            overlays: ol.Collection.<ol.Overlay>,
  *            mapRendererPlugin: olx.MapRendererPlugin,
  *            values: Object.<string, *>}}
@@ -554,7 +615,6 @@ ol.SnapSegmentDataType;
 /**
  * @typedef {{attributions: (ol.AttributionLike|undefined),
  *            extent: (null|ol.Extent|undefined),
- *            logo: (string|olx.LogoOptions|undefined),
  *            projection: ol.ProjectionLike,
  *            resolutions: (Array.<number>|undefined),
  *            state: (ol.source.State|undefined)}}
@@ -572,7 +632,6 @@ ol.SourceRasterRenderedState;
 
 /**
  * @typedef {{attributions: (ol.AttributionLike|undefined),
- *            logo: (string|olx.LogoOptions|undefined),
  *            projection: ol.ProjectionLike,
  *            state: (ol.source.State|undefined),
  *            wrapX: (boolean|undefined)}}
@@ -584,7 +643,6 @@ ol.SourceSourceOptions;
  * @typedef {{attributions: (ol.AttributionLike|undefined),
  *            cacheSize: (number|undefined),
  *            extent: (ol.Extent|undefined),
- *            logo: (string|olx.LogoOptions|undefined),
  *            opaque: (boolean|undefined),
  *            tilePixelRatio: (number|undefined),
  *            projection: ol.ProjectionLike,
@@ -600,7 +658,6 @@ ol.SourceTileOptions;
  * @typedef {{attributions: (ol.AttributionLike|undefined),
  *            cacheSize: (number|undefined),
  *            extent: (ol.Extent|undefined),
- *            logo: (string|olx.LogoOptions|undefined),
  *            opaque: (boolean|undefined),
  *            projection: ol.ProjectionLike,
  *            state: (ol.source.State|undefined),

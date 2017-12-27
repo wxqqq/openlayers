@@ -1,8 +1,9 @@
-goog.provide('ol.featureloader');
-
-goog.require('ol');
-goog.require('ol.format.FormatType');
-goog.require('ol.xml');
+/**
+ * @module ol/featureloader
+ */
+import {nullFunction} from './index.js';
+import FormatType from './format/FormatType.js';
+import _ol_xml_ from './xml.js';
 
 
 /**
@@ -16,7 +17,7 @@ goog.require('ol.xml');
  *     source as `this`.
  * @return {ol.FeatureLoader} The feature loader.
  */
-ol.featureloader.loadFeaturesXhr = function(url, format, success, failure) {
+export function loadFeaturesXhr(url, format, success, failure) {
   return (
     /**
      * @param {ol.Extent} extent Extent.
@@ -29,7 +30,7 @@ ol.featureloader.loadFeaturesXhr = function(url, format, success, failure) {
       xhr.open('GET',
           typeof url === 'function' ? url(extent, resolution, projection) : url,
           true);
-      if (format.getType() == ol.format.FormatType.ARRAY_BUFFER) {
+      if (format.getType() == FormatType.ARRAY_BUFFER) {
         xhr.responseType = 'arraybuffer';
       }
       /**
@@ -42,15 +43,14 @@ ol.featureloader.loadFeaturesXhr = function(url, format, success, failure) {
           var type = format.getType();
           /** @type {Document|Node|Object|string|undefined} */
           var source;
-          if (type == ol.format.FormatType.JSON ||
-                type == ol.format.FormatType.TEXT) {
+          if (type == FormatType.JSON || type == FormatType.TEXT) {
             source = xhr.responseText;
-          } else if (type == ol.format.FormatType.XML) {
+          } else if (type == FormatType.XML) {
             source = xhr.responseXML;
             if (!source) {
-              source = ol.xml.parse(xhr.responseText);
+              source = _ol_xml_.parse(xhr.responseText);
             }
-          } else if (type == ol.format.FormatType.ARRAY_BUFFER) {
+          } else if (type == FormatType.ARRAY_BUFFER) {
             source = /** @type {ArrayBuffer} */ (xhr.response);
           }
           if (source) {
@@ -71,8 +71,9 @@ ol.featureloader.loadFeaturesXhr = function(url, format, success, failure) {
         failure.call(this);
       }.bind(this);
       xhr.send();
-    });
-};
+    }
+  );
+}
 
 
 /**
@@ -84,8 +85,8 @@ ol.featureloader.loadFeaturesXhr = function(url, format, success, failure) {
  * @return {ol.FeatureLoader} The feature loader.
  * @api
  */
-ol.featureloader.xhr = function(url, format) {
-  return ol.featureloader.loadFeaturesXhr(url, format,
+export function xhr(url, format) {
+  return loadFeaturesXhr(url, format,
       /**
        * @param {Array.<ol.Feature>} features The loaded features.
        * @param {ol.proj.Projection} dataProjection Data projection.
@@ -93,5 +94,5 @@ ol.featureloader.xhr = function(url, format) {
        */
       function(features, dataProjection) {
         this.addFeatures(features);
-      }, /* FIXME handle error */ ol.nullFunction);
-};
+      }, /* FIXME handle error */ nullFunction);
+}

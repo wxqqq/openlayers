@@ -1,11 +1,9 @@
-
-
-goog.require('ol.Feature');
-goog.require('ol.geom.MultiPolygon');
-goog.require('ol.geom.Polygon');
-goog.require('ol.format.Feature');
-goog.require('ol.proj');
-goog.require('ol.format.TopoJSON');
+import _ol_Feature_ from '../../../../src/ol/Feature.js';
+import MultiPolygon from '../../../../src/ol/geom/MultiPolygon.js';
+import Polygon from '../../../../src/ol/geom/Polygon.js';
+import FeatureFormat from '../../../../src/ol/format/Feature.js';
+import {transform} from '../../../../src/ol/proj.js';
+import TopoJSON from '../../../../src/ol/format/TopoJSON.js';
 
 var aruba = {
   type: 'Topology',
@@ -44,13 +42,13 @@ describe('ol.format.TopoJSON', function() {
 
   var format;
   before(function() {
-    format = new ol.format.TopoJSON();
+    format = new TopoJSON();
   });
 
   describe('constructor', function() {
     it('creates a new format', function() {
-      expect(format).to.be.a(ol.format.Feature);
-      expect(format).to.be.a(ol.format.TopoJSON);
+      expect(format).to.be.a(FeatureFormat);
+      expect(format).to.be.a(TopoJSON);
     });
   });
 
@@ -61,10 +59,10 @@ describe('ol.format.TopoJSON', function() {
       expect(features).to.have.length(1);
 
       var feature = features[0];
-      expect(feature).to.be.a(ol.Feature);
+      expect(feature).to.be.a(_ol_Feature_);
 
       var geometry = feature.getGeometry();
-      expect(geometry).to.be.a(ol.geom.Polygon);
+      expect(geometry).to.be.a(Polygon);
 
       // Parses identifier
       expect(feature.getId()).to.be(533);
@@ -82,7 +80,7 @@ describe('ol.format.TopoJSON', function() {
       expect(features).to.have.length(1);
 
       var feature = features[0];
-      expect(feature).to.be.a(ol.Feature);
+      expect(feature).to.be.a(_ol_Feature_);
       expect(feature.getId()).to.be(0);
     });
 
@@ -125,25 +123,25 @@ describe('ol.format.TopoJSON', function() {
         var point = features[0].getGeometry();
         expect(point.getType()).to.be('Point');
         expect(features[0].getGeometry().getCoordinates()).to.eql(
-            ol.proj.transform([102.0, 0.5], 'EPSG:4326', 'EPSG:3857'));
+            transform([102.0, 0.5], 'EPSG:4326', 'EPSG:3857'));
 
         var line = features[1].getGeometry();
         expect(line.getType()).to.be('LineString');
         expect(line.getCoordinates()).to.eql([
-          ol.proj.transform([102.0, 0.0], 'EPSG:4326', 'EPSG:3857'),
-          ol.proj.transform([103.0, 1.0], 'EPSG:4326', 'EPSG:3857'),
-          ol.proj.transform([104.0, 0.0], 'EPSG:4326', 'EPSG:3857'),
-          ol.proj.transform([105.0, 1.0], 'EPSG:4326', 'EPSG:3857')
+          transform([102.0, 0.0], 'EPSG:4326', 'EPSG:3857'),
+          transform([103.0, 1.0], 'EPSG:4326', 'EPSG:3857'),
+          transform([104.0, 0.0], 'EPSG:4326', 'EPSG:3857'),
+          transform([105.0, 1.0], 'EPSG:4326', 'EPSG:3857')
         ]);
 
         var polygon = features[2].getGeometry();
         expect(polygon.getType()).to.be('Polygon');
         expect(polygon.getCoordinates()).to.eql([[
-          ol.proj.transform([100.0, 0.0], 'EPSG:4326', 'EPSG:3857'),
-          ol.proj.transform([100.0, 1.0], 'EPSG:4326', 'EPSG:3857'),
-          ol.proj.transform([101.0, 1.0], 'EPSG:4326', 'EPSG:3857'),
-          ol.proj.transform([101.0, 0.0], 'EPSG:4326', 'EPSG:3857'),
-          ol.proj.transform([100.0, 0.0], 'EPSG:4326', 'EPSG:3857')
+          transform([100.0, 0.0], 'EPSG:4326', 'EPSG:3857'),
+          transform([100.0, 1.0], 'EPSG:4326', 'EPSG:3857'),
+          transform([101.0, 1.0], 'EPSG:4326', 'EPSG:3857'),
+          transform([101.0, 0.0], 'EPSG:4326', 'EPSG:3857'),
+          transform([100.0, 0.0], 'EPSG:4326', 'EPSG:3857')
         ]]);
 
         done();
@@ -157,16 +155,16 @@ describe('ol.format.TopoJSON', function() {
         expect(features.length).to.be(178);
 
         var first = features[0];
-        expect(first).to.be.a(ol.Feature);
+        expect(first).to.be.a(_ol_Feature_);
         var firstGeom = first.getGeometry();
-        expect(firstGeom).to.be.a(ol.geom.MultiPolygon);
+        expect(firstGeom).to.be.a(MultiPolygon);
         expect(firstGeom.getExtent()).to.eql(
             [-180, -85.60903777459777, 180, 83.64513000000002]);
 
         var last = features[177];
-        expect(last).to.be.a(ol.Feature);
+        expect(last).to.be.a(_ol_Feature_);
         var lastGeom = last.getGeometry();
-        expect(lastGeom).to.be.a(ol.geom.Polygon);
+        expect(lastGeom).to.be.a(Polygon);
         expect(lastGeom.getExtent()).to.eql([
           25.26325263252633, -22.271802279310577,
           32.848528485284874, -15.50833810039586
@@ -178,7 +176,7 @@ describe('ol.format.TopoJSON', function() {
 
     it('sets the topology\'s child names as feature property', function(done) {
       afterLoadText('spec/ol/format/topojson/world-110m.json', function(text) {
-        var format = new ol.format.TopoJSON({
+        var format = new TopoJSON({
           layerName: 'layer'
         });
         var features = format.readFeatures(text);
@@ -190,7 +188,7 @@ describe('ol.format.TopoJSON', function() {
 
     it('only parses features from specified topology\'s children', function(done) {
       afterLoadText('spec/ol/format/topojson/world-110m.json', function(text) {
-        var format = new ol.format.TopoJSON({
+        var format = new TopoJSON({
           layers: ['land']
         });
         var features = format.readFeatures(text);

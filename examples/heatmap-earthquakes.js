@@ -1,18 +1,18 @@
-goog.require('ol.Map');
-goog.require('ol.View');
-goog.require('ol.format.KML');
-goog.require('ol.layer.Heatmap');
-goog.require('ol.layer.Tile');
-goog.require('ol.source.Stamen');
-goog.require('ol.source.Vector');
+import Map from '../src/ol/Map.js';
+import _ol_View_ from '../src/ol/View.js';
+import KML from '../src/ol/format/KML.js';
+import HeatmapLayer from '../src/ol/layer/Heatmap.js';
+import TileLayer from '../src/ol/layer/Tile.js';
+import _ol_source_Stamen_ from '../src/ol/source/Stamen.js';
+import _ol_source_Vector_ from '../src/ol/source/Vector.js';
 
 var blur = document.getElementById('blur');
 var radius = document.getElementById('radius');
 
-var vector = new ol.layer.Heatmap({
-  source: new ol.source.Vector({
+var vector = new HeatmapLayer({
+  source: new _ol_source_Vector_({
     url: 'data/kml/2012_Earthquakes_Mag5.kml',
-    format: new ol.format.KML({
+    format: new KML({
       extractStyles: false
     })
   }),
@@ -29,16 +29,16 @@ vector.getSource().on('addfeature', function(event) {
   event.feature.set('weight', magnitude - 5);
 });
 
-var raster = new ol.layer.Tile({
-  source: new ol.source.Stamen({
+var raster = new TileLayer({
+  source: new _ol_source_Stamen_({
     layer: 'toner'
   })
 });
 
-var map = new ol.Map({
+var map = new Map({
   layers: [raster, vector],
   target: 'map',
-  view: new ol.View({
+  view: new _ol_View_({
     center: [0, 0],
     zoom: 2
   })

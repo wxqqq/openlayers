@@ -1,21 +1,19 @@
+import _ol_proj_Projection_ from '../../../../src/ol/proj/Projection.js';
+import * as transforms from '../../../../src/ol/proj/transforms.js';
 
 
-goog.require('ol.proj.Projection');
-goog.require('ol.proj.transforms');
-
-
-describe('ol.proj.transforms.remove()', function() {
+describe('transforms.remove()', function() {
 
   var extent = [180, -90, 180, 90];
   var units = 'degrees';
 
-  it('removes functions cached by ol.proj.transforms.add()', function() {
-    var foo = new ol.proj.Projection({
+  it('removes functions cached by transforms.add()', function() {
+    var foo = new _ol_proj_Projection_({
       code: 'foo',
       units: units,
       extent: extent
     });
-    var bar = new ol.proj.Projection({
+    var bar = new _ol_proj_Projection_({
       code: 'bar',
       units: units,
       extent: extent
@@ -23,15 +21,12 @@ describe('ol.proj.transforms.remove()', function() {
     var transform = function(input, output, dimension) {
       return input;
     };
-    ol.proj.transforms.add(foo, bar, transform);
-    var cache = ol.proj.transforms.cache_;
-    expect(cache).not.to.be(undefined);
-    expect(cache.foo).not.to.be(undefined);
-    expect(cache.foo.bar).to.be(transform);
+    transforms.add(foo, bar, transform);
+    expect(transforms.get('foo', 'bar')).to.be(transform);
 
-    var removed = ol.proj.transforms.remove(foo, bar);
+    var removed = transforms.remove(foo, bar);
     expect(removed).to.be(transform);
-    expect(cache.foo).to.be(undefined);
+    expect(transforms.get('foo', 'bar')).to.be(undefined);
   });
 
 });

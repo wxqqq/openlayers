@@ -1,17 +1,16 @@
+import Map from '../../../../src/ol/Map.js';
+import MapBrowserEvent from '../../../../src/ol/MapBrowserEvent.js';
+import _ol_View_ from '../../../../src/ol/View.js';
+import Event from '../../../../src/ol/events/Event.js';
+import Interaction from '../../../../src/ol/interaction/Interaction.js';
 
-
-goog.require('ol.Map');
-goog.require('ol.MapBrowserEvent');
-goog.require('ol.View');
-goog.require('ol.events.Event');
-goog.require('ol.interaction.Interaction');
 describe('ol.interaction.KeyboardZoom', function() {
   var map;
 
   beforeEach(function() {
-    map = new ol.Map({
+    map = new Map({
       target: createMapDiv(100, 100),
-      view: new ol.View({
+      view: new _ol_View_({
         center: [0, 0],
         resolutions: [1],
         zoom: 0
@@ -25,11 +24,11 @@ describe('ol.interaction.KeyboardZoom', function() {
 
   describe('handleEvent()', function() {
     it('zooms on + and - keys', function() {
-      var spy = sinon.spy(ol.interaction.Interaction, 'zoomByDelta');
-      var event = new ol.MapBrowserEvent('keydown', map, {
+      var spy = sinon.spy(Interaction, 'zoomByDelta');
+      var event = new MapBrowserEvent('keydown', map, {
         type: 'keydown',
         target: map.getTargetElement(),
-        preventDefault: ol.events.Event.prototype.preventDefault
+        preventDefault: Event.prototype.preventDefault
       });
       event.originalEvent.charCode = '+'.charCodeAt(0);
       map.handleMapBrowserEvent(event);
@@ -37,7 +36,7 @@ describe('ol.interaction.KeyboardZoom', function() {
       map.handleMapBrowserEvent(event);
       expect(spy.getCall(0).args[1]).to.eql(1);
       expect(spy.getCall(1).args[1]).to.eql(-1);
-      ol.interaction.Interaction.zoomByDelta.restore();
+      Interaction.zoomByDelta.restore();
     });
   });
 

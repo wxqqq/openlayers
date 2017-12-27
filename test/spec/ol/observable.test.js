@@ -1,7 +1,5 @@
-
-
-goog.require('ol.events.EventTarget');
-goog.require('ol.Observable');
+import EventTarget from '../../../src/ol/events/EventTarget.js';
+import _ol_Observable_ from '../../../src/ol/Observable.js';
 
 
 describe('ol.Observable', function() {
@@ -9,9 +7,9 @@ describe('ol.Observable', function() {
   describe('constructor', function() {
 
     it('creates a new observable', function() {
-      var observable = new ol.Observable();
-      expect(observable).to.be.a(ol.Observable);
-      expect(observable).to.be.a(ol.events.EventTarget);
+      var observable = new _ol_Observable_();
+      expect(observable).to.be.a(_ol_Observable_);
+      expect(observable).to.be.a(EventTarget);
     });
 
   });
@@ -19,7 +17,7 @@ describe('ol.Observable', function() {
   describe('#on()', function() {
     var observable, listener;
     beforeEach(function() {
-      observable = new ol.Observable();
+      observable = new _ol_Observable_();
       listener = sinon.spy();
     });
 
@@ -43,15 +41,6 @@ describe('ol.Observable', function() {
       expect(listener.callCount).to.be(2);
     });
 
-    it('accepts an optional `this` arg for the listener', function() {
-      var thisArg = {};
-      observable.on('foo', listener, thisArg);
-
-      observable.dispatchEvent('foo');
-      expect(listener.calledOnce).to.be(true);
-      expect(listener.calledOn(thisArg)).to.be(true);
-    });
-
     it('returns a listener key', function() {
       var key = observable.on('foo', listener);
 
@@ -63,7 +52,7 @@ describe('ol.Observable', function() {
   describe('#once()', function() {
     var observable, listener;
     beforeEach(function() {
-      observable = new ol.Observable();
+      observable = new _ol_Observable_();
       listener = sinon.spy();
     });
 
@@ -108,15 +97,6 @@ describe('ol.Observable', function() {
       expect(listener.callCount).to.be(2);
     });
 
-    it('accepts an optional `this` arg for the listener', function() {
-      var thisArg = {};
-      observable.once('foo', listener, thisArg);
-
-      observable.dispatchEvent('foo');
-      expect(listener.calledOnce).to.be(true);
-      expect(listener.calledOn(thisArg)).to.be(true);
-    });
-
     it('returns a listener key', function() {
       var key = observable.once('foo', listener);
 
@@ -128,7 +108,7 @@ describe('ol.Observable', function() {
   describe('#un()', function() {
     var observable, listener;
     beforeEach(function() {
-      observable = new ol.Observable();
+      observable = new _ol_Observable_();
       listener = sinon.spy();
     });
 
@@ -143,30 +123,12 @@ describe('ol.Observable', function() {
       expect(listener.calledOnce).to.be(true);
     });
 
-    it('accepts a `this` arg', function() {
-      var thisArg = {};
-      observable.on('foo', listener, thisArg);
-
-      observable.dispatchEvent('foo');
-      expect(listener.calledOnce).to.be(true);
-
-      // will not unregister without the same thisArg
-      observable.un('foo', listener);
-      observable.dispatchEvent('foo');
-      expect(listener.callCount).to.be(2);
-
-      // properly unregister by providing the same thisArg
-      observable.un('foo', listener, thisArg);
-      observable.dispatchEvent('foo');
-      expect(listener.callCount).to.be(2);
-    });
-
   });
 
   describe('ol.Observable.unByKey()', function() {
     var observable, listener;
     beforeEach(function() {
-      observable = new ol.Observable();
+      observable = new _ol_Observable_();
       listener = sinon.spy();
     });
 
@@ -176,7 +138,7 @@ describe('ol.Observable', function() {
       observable.dispatchEvent('foo');
       expect(listener.calledOnce).to.be(true);
 
-      ol.Observable.unByKey(key);
+      _ol_Observable_.unByKey(key);
       observable.dispatchEvent('foo');
       expect(listener.callCount).to.be(1);
     });

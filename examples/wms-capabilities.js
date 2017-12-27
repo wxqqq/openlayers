@@ -1,6 +1,6 @@
-goog.require('ol.format.WMSCapabilities');
+import WMSCapabilities from '../src/ol/format/WMSCapabilities.js';
 
-var parser = new ol.format.WMSCapabilities();
+var parser = new WMSCapabilities();
 
 fetch('data/ogcsample.xml').then(function(response) {
   return response.text();

@@ -1,10 +1,10 @@
-goog.require('ol');
-goog.require('ol.Map');
-goog.require('ol.View');
-goog.require('ol.control');
-goog.require('ol.control.Control');
-goog.require('ol.layer.Tile');
-goog.require('ol.source.OSM');
+import {inherits} from '../src/ol/index.js';
+import Map from '../src/ol/Map.js';
+import _ol_View_ from '../src/ol/View.js';
+import {defaults as defaultControls} from '../src/ol/control.js';
+import Control from '../src/ol/control/Control.js';
+import TileLayer from '../src/ol/layer/Tile.js';
+import _ol_source_OSM_ from '../src/ol/source/OSM.js';
 
 
 /**
@@ -43,13 +43,13 @@ app.RotateNorthControl = function(opt_options) {
   element.className = 'rotate-north ol-unselectable ol-control';
   element.appendChild(button);
 
-  ol.control.Control.call(this, {
+  Control.call(this, {
     element: element,
     target: options.target
   });
 
 };
-ol.inherits(app.RotateNorthControl, ol.control.Control);
+inherits(app.RotateNorthControl, Control);
 
 
 //
@@ -57,21 +57,21 @@ ol.inherits(app.RotateNorthControl, ol.control.Control);
 //
 
 
-var map = new ol.Map({
-  controls: ol.control.defaults({
-    attributionOptions: /** @type {olx.control.AttributionOptions} */ ({
+var map = new Map({
+  controls: defaultControls({
+    attributionOptions: {
       collapsible: false
-    })
+    }
   }).extend([
     new app.RotateNorthControl()
   ]),
   layers: [
-    new ol.layer.Tile({
-      source: new ol.source.OSM()
+    new TileLayer({
+      source: new _ol_source_OSM_()
     })
   ],
   target: 'map',
-  view: new ol.View({
+  view: new _ol_View_({
     center: [0, 0],
     zoom: 3,
     rotation: 1

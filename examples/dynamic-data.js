@@ -1,50 +1,50 @@
-goog.require('ol.Map');
-goog.require('ol.View');
-goog.require('ol.geom.MultiPoint');
-goog.require('ol.geom.Point');
-goog.require('ol.layer.Tile');
-goog.require('ol.source.OSM');
-goog.require('ol.style.Circle');
-goog.require('ol.style.Fill');
-goog.require('ol.style.Stroke');
-goog.require('ol.style.Style');
+import Map from '../src/ol/Map.js';
+import _ol_View_ from '../src/ol/View.js';
+import MultiPoint from '../src/ol/geom/MultiPoint.js';
+import Point from '../src/ol/geom/Point.js';
+import TileLayer from '../src/ol/layer/Tile.js';
+import _ol_source_OSM_ from '../src/ol/source/OSM.js';
+import _ol_style_Circle_ from '../src/ol/style/Circle.js';
+import _ol_style_Fill_ from '../src/ol/style/Fill.js';
+import _ol_style_Stroke_ from '../src/ol/style/Stroke.js';
+import _ol_style_Style_ from '../src/ol/style/Style.js';
 
 
-var map = new ol.Map({
+var map = new Map({
   layers: [
-    new ol.layer.Tile({
-      source: new ol.source.OSM()
+    new TileLayer({
+      source: new _ol_source_OSM_()
     })
   ],
   target: 'map',
-  view: new ol.View({
+  view: new _ol_View_({
     center: [0, 0],
     zoom: 2
   })
 });
 
-var imageStyle = new ol.style.Style({
-  image: new ol.style.Circle({
+var imageStyle = new _ol_style_Style_({
+  image: new _ol_style_Circle_({
     radius: 5,
     snapToPixel: false,
-    fill: new ol.style.Fill({color: 'yellow'}),
-    stroke: new ol.style.Stroke({color: 'red', width: 1})
+    fill: new _ol_style_Fill_({color: 'yellow'}),
+    stroke: new _ol_style_Stroke_({color: 'red', width: 1})
   })
 });
 
-var headInnerImageStyle = new ol.style.Style({
-  image: new ol.style.Circle({
+var headInnerImageStyle = new _ol_style_Style_({
+  image: new _ol_style_Circle_({
     radius: 2,
     snapToPixel: false,
-    fill: new ol.style.Fill({color: 'blue'})
+    fill: new _ol_style_Fill_({color: 'blue'})
   })
 });
 
-var headOuterImageStyle = new ol.style.Style({
-  image: new ol.style.Circle({
+var headOuterImageStyle = new _ol_style_Style_({
+  image: new _ol_style_Circle_({
     radius: 5,
     snapToPixel: false,
-    fill: new ol.style.Fill({color: 'black'})
+    fill: new _ol_style_Fill_({color: 'black'})
   })
 });
 
@@ -66,9 +66,9 @@ map.on('postcompose', function(event) {
     coordinates.push([x, y]);
   }
   vectorContext.setStyle(imageStyle);
-  vectorContext.drawGeometry(new ol.geom.MultiPoint(coordinates));
+  vectorContext.drawGeometry(new MultiPoint(coordinates));
 
-  var headPoint = new ol.geom.Point(coordinates[coordinates.length - 1]);
+  var headPoint = new Point(coordinates[coordinates.length - 1]);
 
   vectorContext.setStyle(headOuterImageStyle);
   vectorContext.drawGeometry(headPoint);

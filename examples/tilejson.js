@@ -1,20 +1,20 @@
-goog.require('ol.Map');
-goog.require('ol.View');
-goog.require('ol.layer.Tile');
-goog.require('ol.source.TileJSON');
+import Map from '../src/ol/Map.js';
+import _ol_View_ from '../src/ol/View.js';
+import TileLayer from '../src/ol/layer/Tile.js';
+import _ol_source_TileJSON_ from '../src/ol/source/TileJSON.js';
 
 
-var map = new ol.Map({
+var map = new Map({
   layers: [
-    new ol.layer.Tile({
-      source: new ol.source.TileJSON({
+    new TileLayer({
+      source: new _ol_source_TileJSON_({
         url: 'https://api.tiles.mapbox.com/v3/mapbox.geography-class.json?secure',
         crossOrigin: 'anonymous'
       })
     })
   ],
   target: 'map',
-  view: new ol.View({
+  view: new _ol_View_({
     center: [0, 0],
     zoom: 2
   })

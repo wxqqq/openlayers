@@ -1,56 +1,55 @@
-goog.require('ol.Map');
-goog.require('ol.View');
-goog.require('ol.format.GeoJSON');
-goog.require('ol.layer.Image');
-goog.require('ol.layer.Tile');
-goog.require('ol.layer.Vector');
-goog.require('ol.source.ImageVector');
-goog.require('ol.source.OSM');
-goog.require('ol.source.Vector');
-goog.require('ol.style.Fill');
-goog.require('ol.style.Stroke');
-goog.require('ol.style.Style');
+import Map from '../src/ol/Map.js';
+import _ol_View_ from '../src/ol/View.js';
+import GeoJSON from '../src/ol/format/GeoJSON.js';
+import _ol_layer_Vector_ from '../src/ol/layer/Vector.js';
+import _ol_source_Vector_ from '../src/ol/source/Vector.js';
+import _ol_style_Fill_ from '../src/ol/style/Fill.js';
+import _ol_style_Stroke_ from '../src/ol/style/Stroke.js';
+import _ol_style_Style_ from '../src/ol/style/Style.js';
+import _ol_style_Text_ from '../src/ol/style/Text.js';
 
 
-var map = new ol.Map({
+var style = new _ol_style_Style_({
+  fill: new _ol_style_Fill_({
+    color: 'rgba(255, 255, 255, 0.6)'
+  }),
+  stroke: new _ol_style_Stroke_({
+    color: '#319FD3',
+    width: 1
+  }),
+  text: new _ol_style_Text_()
+});
+
+var map = new Map({
   layers: [
-    new ol.layer.Tile({
-      source: new ol.source.OSM()
-    }),
-    new ol.layer.Image({
-      source: new ol.source.ImageVector({
-        source: new ol.source.Vector({
-          url: 'data/geojson/countries.geojson',
-          format: new ol.format.GeoJSON()
-        }),
-        style: new ol.style.Style({
-          fill: new ol.style.Fill({
-            color: 'rgba(255, 255, 255, 0.6)'
-          }),
-          stroke: new ol.style.Stroke({
-            color: '#319FD3',
-            width: 1
-          })
-        })
-      })
+    new _ol_layer_Vector_({
+      renderMode: 'image',
+      source: new _ol_source_Vector_({
+        url: 'data/geojson/countries.geojson',
+        format: new GeoJSON()
+      }),
+      style: function(feature) {
+        style.getText().setText(feature.get('name'));
+        return style;
+      }
     })
   ],
   target: 'map',
-  view: new ol.View({
+  view: new _ol_View_({
     center: [0, 0],
     zoom: 1
   })
 });
 
-var featureOverlay = new ol.layer.Vector({
-  source: new ol.source.Vector(),
+var featureOverlay = new _ol_layer_Vector_({
+  source: new _ol_source_Vector_(),
   map: map,
-  style: new ol.style.Style({
-    stroke: new ol.style.Stroke({
+  style: new _ol_style_Style_({
+    stroke: new _ol_style_Stroke_({
       color: '#f00',
       width: 1
     }),
-    fill: new ol.style.Fill({
+    fill: new _ol_style_Fill_({
       color: 'rgba(255,0,0,0.1)'
     })
   })

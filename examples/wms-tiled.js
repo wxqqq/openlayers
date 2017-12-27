@@ -1,27 +1,29 @@
-goog.require('ol.Map');
-goog.require('ol.View');
-goog.require('ol.layer.Tile');
-goog.require('ol.source.OSM');
-goog.require('ol.source.TileWMS');
+import Map from '../src/ol/Map.js';
+import _ol_View_ from '../src/ol/View.js';
+import TileLayer from '../src/ol/layer/Tile.js';
+import _ol_source_OSM_ from '../src/ol/source/OSM.js';
+import _ol_source_TileWMS_ from '../src/ol/source/TileWMS.js';
 
 
 var layers = [
-  new ol.layer.Tile({
-    source: new ol.source.OSM()
+  new TileLayer({
+    source: new _ol_source_OSM_()
   }),
-  new ol.layer.Tile({
+  new TileLayer({
     extent: [-13884991, 2870341, -7455066, 6338219],
-    source: new ol.source.TileWMS({
+    source: new _ol_source_TileWMS_({
       url: 'https://ahocevar.com/geoserver/wms',
       params: {'LAYERS': 'topp:states', 'TILED': true},
-      serverType: 'geoserver'
+      serverType: 'geoserver',
+      // Countries have transparency, so do not fade tiles:
+      transition: 0
     })
   })
 ];
-var map = new ol.Map({
+var map = new Map({
   layers: layers,
   target: 'map',
-  view: new ol.View({
+  view: new _ol_View_({
     center: [-10997148, 4569099],
     zoom: 4
   })

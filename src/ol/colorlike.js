@@ -1,6 +1,7 @@
-goog.provide('ol.colorlike');
-
-goog.require('ol.color');
+/**
+ * @module ol/colorlike
+ */
+import {asString} from './color.js';
 
 
 /**
@@ -8,23 +9,23 @@ goog.require('ol.color');
  * @return {ol.ColorLike} The color as an ol.ColorLike
  * @api
  */
-ol.colorlike.asColorLike = function(color) {
-  if (ol.colorlike.isColorLike(color)) {
+export function asColorLike(color) {
+  if (isColorLike(color)) {
     return /** @type {string|CanvasPattern|CanvasGradient} */ (color);
   } else {
-    return ol.color.asString(/** @type {ol.Color} */ (color));
+    return asString(/** @type {ol.Color} */ (color));
   }
-};
+}
 
 
 /**
  * @param {?} color The value that is potentially an ol.ColorLike
  * @return {boolean} Whether the color is an ol.ColorLike
  */
-ol.colorlike.isColorLike = function(color) {
+export function isColorLike(color) {
   return (
     typeof color === 'string' ||
     color instanceof CanvasPattern ||
     color instanceof CanvasGradient
   );
-};
+}

@@ -1,11 +1,11 @@
 // NOCOMPILE
-goog.require('ol.Map');
-goog.require('ol.View');
-goog.require('ol.layer.Image');
-goog.require('ol.layer.Tile');
-goog.require('ol.proj');
-goog.require('ol.source.BingMaps');
-goog.require('ol.source.Raster');
+import Map from '../src/ol/Map.js';
+import _ol_View_ from '../src/ol/View.js';
+import _ol_layer_Image_ from '../src/ol/layer/Image.js';
+import TileLayer from '../src/ol/layer/Tile.js';
+import {fromLonLat} from '../src/ol/proj.js';
+import _ol_source_BingMaps_ from '../src/ol/source/BingMaps.js';
+import RasterSource from '../src/ol/source/Raster.js';
 
 function growRegion(inputs, data) {
   var image = inputs[0];
@@ -74,11 +74,11 @@ function next4Edges(edge) {
 
 var key = 'As1HiMj1PvLPlqc_gtM7AqZfBL8ZL3VrjaS3zIb22Uvb9WKhuJObROC-qUpa81U5';
 
-var imagery = new ol.layer.Tile({
-  source: new ol.source.BingMaps({key: key, imagerySet: 'Aerial'})
+var imagery = new TileLayer({
+  source: new _ol_source_BingMaps_({key: key, imagerySet: 'Aerial'})
 });
 
-var raster = new ol.source.Raster({
+var raster = new RasterSource({
   sources: [imagery.getSource()],
   operationType: 'image',
   operation: growRegion,
@@ -89,16 +89,16 @@ var raster = new ol.source.Raster({
   }
 });
 
-var rasterImage = new ol.layer.Image({
+var rasterImage = new _ol_layer_Image_({
   opacity: 0.7,
   source: raster
 });
 
-var map = new ol.Map({
+var map = new Map({
   layers: [imagery, rasterImage],
   target: 'map',
-  view: new ol.View({
-    center: ol.proj.fromLonLat([-119.07, 47.65]),
+  view: new _ol_View_({
+    center: fromLonLat([-119.07, 47.65]),
     zoom: 11
   })
 });

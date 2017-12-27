@@ -1,17 +1,16 @@
+import Map from '../../../../src/ol/Map.js';
+import MapBrowserEvent from '../../../../src/ol/MapBrowserEvent.js';
+import _ol_View_ from '../../../../src/ol/View.js';
+import Event from '../../../../src/ol/events/Event.js';
+import Interaction from '../../../../src/ol/interaction/Interaction.js';
 
-
-goog.require('ol.Map');
-goog.require('ol.MapBrowserEvent');
-goog.require('ol.View');
-goog.require('ol.events.Event');
-goog.require('ol.interaction.Interaction');
 describe('ol.interaction.KeyboardPan', function() {
   var map;
 
   beforeEach(function() {
-    map = new ol.Map({
+    map = new Map({
       target: createMapDiv(100, 100),
-      view: new ol.View({
+      view: new _ol_View_({
         center: [0, 0],
         resolutions: [1],
         zoom: 0
@@ -25,11 +24,11 @@ describe('ol.interaction.KeyboardPan', function() {
 
   describe('handleEvent()', function() {
     it('pans on arrow keys', function() {
-      var spy = sinon.spy(ol.interaction.Interaction, 'pan');
-      var event = new ol.MapBrowserEvent('keydown', map, {
+      var spy = sinon.spy(Interaction, 'pan');
+      var event = new MapBrowserEvent('keydown', map, {
         type: 'keydown',
         target: map.getTargetElement(),
-        preventDefault: ol.events.Event.prototype.preventDefault
+        preventDefault: Event.prototype.preventDefault
       });
       event.originalEvent.keyCode = 40; // DOWN
       map.handleMapBrowserEvent(event);
@@ -43,7 +42,7 @@ describe('ol.interaction.KeyboardPan', function() {
       expect(spy.getCall(1).args[1]).to.eql([0, 128]);
       expect(spy.getCall(2).args[1]).to.eql([-128, 0]);
       expect(spy.getCall(3).args[1]).to.eql([128, 0]);
-      ol.interaction.Interaction.pan.restore();
+      Interaction.pan.restore();
     });
   });
 

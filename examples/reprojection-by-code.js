@@ -1,20 +1,22 @@
-goog.require('ol.Map');
-goog.require('ol.View');
-goog.require('ol.extent');
-goog.require('ol.layer.Tile');
-goog.require('ol.proj');
-goog.require('ol.source.OSM');
-goog.require('ol.source.TileImage');
+import Map from '../src/ol/Map.js';
+import _ol_View_ from '../src/ol/View.js';
+import * as _ol_extent_ from '../src/ol/extent.js';
+import TileLayer from '../src/ol/layer/Tile.js';
+import {get as getProjection, getTransform} from '../src/ol/proj.js';
+import {register} from '../src/ol/proj/proj4.js';
+import _ol_source_OSM_ from '../src/ol/source/OSM.js';
+import _ol_source_TileImage_ from '../src/ol/source/TileImage.js';
+import proj4 from 'proj4';
 
 
-var map = new ol.Map({
+var map = new Map({
   layers: [
-    new ol.layer.Tile({
-      source: new ol.source.OSM()
+    new TileLayer({
+      source: new _ol_source_OSM_()
     })
   ],
   target: 'map',
-  view: new ol.View({
+  view: new _ol_View_({
     projection: 'EPSG:3857',
     center: [0, 0],
     zoom: 1
@@ -30,7 +32,7 @@ var renderEdgesCheckbox = document.getElementById('render-edges');
 function setProjection(code, name, proj4def, bbox) {
   if (code === null || name === null || proj4def === null || bbox === null) {
     resultSpan.innerHTML = 'Nothing usable found, using EPSG:3857...';
-    map.setView(new ol.View({
+    map.setView(new _ol_View_({
       projection: 'EPSG:3857',
       center: [0, 0],
       zoom: 1
@@ -42,14 +44,15 @@ function setProjection(code, name, proj4def, bbox) {
 
   var newProjCode = 'EPSG:' + code;
   proj4.defs(newProjCode, proj4def);
-  var newProj = ol.proj.get(newProjCode);
-  var fromLonLat = ol.proj.getTransform('EPSG:4326', newProj);
+  register(proj4);
+  var newProj = getProjection(newProjCode);
+  var fromLonLat = getTransform('EPSG:4326', newProj);
 
   // very approximate calculation of projection extent
-  var extent = ol.extent.applyTransform(
+  var extent = _ol_extent_.applyTransform(
       [bbox[1], bbox[2], bbox[3], bbox[0]], fromLonLat);
   newProj.setExtent(extent);
-  var newView = new ol.View({
+  var newView = new _ol_View_({
     projection: newProj
   });
   map.setView(newView);
@@ -97,9 +100,9 @@ searchButton.onclick = function(event) {
  */
 renderEdgesCheckbox.onchange = function() {
   map.getLayers().forEach(function(layer) {
-    if (layer instanceof ol.layer.Tile) {
+    if (layer instanceof TileLayer) {
       var source = layer.getSource();
-      if (source instanceof ol.source.TileImage) {
+      if (source instanceof _ol_source_TileImage_) {
         source.setRenderReprojectionEdges(renderEdgesCheckbox.checked);
       }
     }

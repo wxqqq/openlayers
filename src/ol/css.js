@@ -1,4 +1,6 @@
-goog.provide('ol.css');
+/**
+ * @module ol/css
+ */
 
 
 /**
@@ -7,7 +9,7 @@ goog.provide('ol.css');
  * @const
  * @type {string}
  */
-ol.css.CLASS_HIDDEN = 'ol-hidden';
+export var CLASS_HIDDEN = 'ol-hidden';
 
 
 /**
@@ -16,7 +18,8 @@ ol.css.CLASS_HIDDEN = 'ol-hidden';
  * @const
  * @type {string}
  */
-ol.css.CLASS_SELECTABLE = 'ol-selectable';
+export var CLASS_SELECTABLE = 'ol-selectable';
+
 
 /**
  * The CSS class that we'll give the DOM elements to have them unselectable.
@@ -24,7 +27,7 @@ ol.css.CLASS_SELECTABLE = 'ol-selectable';
  * @const
  * @type {string}
  */
-ol.css.CLASS_UNSELECTABLE = 'ol-unselectable';
+export var CLASS_UNSELECTABLE = 'ol-unselectable';
 
 
 /**
@@ -33,7 +36,7 @@ ol.css.CLASS_UNSELECTABLE = 'ol-unselectable';
  * @const
  * @type {string}
  */
-ol.css.CLASS_UNSUPPORTED = 'ol-unsupported';
+export var CLASS_UNSUPPORTED = 'ol-unsupported';
 
 
 /**
@@ -42,4 +45,31 @@ ol.css.CLASS_UNSUPPORTED = 'ol-unsupported';
  * @const
  * @type {string}
  */
-ol.css.CLASS_CONTROL = 'ol-control';
+export var CLASS_CONTROL = 'ol-control';
+
+
+/**
+ * Get the list of font families from a font spec.  Note that this doesn't work
+ * for font families that have commas in them.
+ * @param {string} The CSS font property.
+ * @return {Object.<string>} The font families (or null if the input spec is invalid).
+ */
+export var getFontFamilies = (function() {
+  var style;
+  var cache = {};
+  return function(font) {
+    if (!style) {
+      style = document.createElement('div').style;
+    }
+    if (!(font in cache)) {
+      style.font = font;
+      var family = style.fontFamily;
+      style.font = '';
+      if (!family) {
+        return null;
+      }
+      cache[font] = family.split(/,\s?/);
+    }
+    return cache[font];
+  };
+})();

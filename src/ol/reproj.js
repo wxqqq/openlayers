@@ -1,9 +1,11 @@
-goog.provide('ol.reproj');
-
-goog.require('ol.dom');
-goog.require('ol.extent');
-goog.require('ol.math');
-goog.require('ol.proj');
+/**
+ * @module ol/reproj
+ */
+import {createCanvasContext2D} from './dom.js';
+import {containsCoordinate, createEmpty, extend, getHeight, getTopLeft, getWidth} from './extent.js';
+import {solveLinearSystem} from './math.js';
+import {getPointResolution, transform} from './proj.js';
+var _ol_reproj_ = {};
 
 
 /**
@@ -18,14 +20,13 @@ goog.require('ol.proj');
  * @param {number} targetResolution Target resolution.
  * @return {number} The best resolution to use. Can be +-Infinity, NaN or 0.
  */
-ol.reproj.calculateSourceResolution = function(sourceProj, targetProj,
+_ol_reproj_.calculateSourceResolution = function(sourceProj, targetProj,
     targetCenter, targetResolution) {
 
-  var sourceCenter = ol.proj.transform(targetCenter, targetProj, sourceProj);
+  var sourceCenter = transform(targetCenter, targetProj, sourceProj);
 
   // calculate the ideal resolution of the source data
-  var sourceResolution =
-      ol.proj.getPointResolution(targetProj, targetResolution, targetCenter);
+  var sourceResolution = getPointResolution(targetProj, targetResolution, targetCenter);
 
   var targetMetersPerUnit = targetProj.getMetersPerUnit();
   if (targetMetersPerUnit !== undefined) {
@@ -41,9 +42,8 @@ ol.reproj.calculateSourceResolution = function(sourceProj, targetProj,
   // in order to achieve optimal results.
 
   var sourceExtent = sourceProj.getExtent();
-  if (!sourceExtent || ol.extent.containsCoordinate(sourceExtent, sourceCenter)) {
-    var compensationFactor =
-        ol.proj.getPointResolution(sourceProj, sourceResolution, sourceCenter) /
+  if (!sourceExtent || containsCoordinate(sourceExtent, sourceCenter)) {
+    var compensationFactor = getPointResolution(sourceProj, sourceResolution, sourceCenter) /
         sourceResolution;
     if (isFinite(compensationFactor) && compensationFactor > 0) {
       sourceResolution /= compensationFactor;
@@ -65,7 +65,7 @@ ol.reproj.calculateSourceResolution = function(sourceProj, targetProj,
  * @return {ol.Coordinate} New point 1 px farther from the centroid.
  * @private
  */
-ol.reproj.enlargeClipPoint_ = function(centroidX, centroidY, x, y) {
+_ol_reproj_.enlargeClipPoint_ = function(centroidX, centroidY, x, y) {
   var dX = x - centroidX, dY = y - centroidY;
   var distance = Math.sqrt(dX * dX + dY * dY);
   return [Math.round(x + dX / distance), Math.round(y + dY / distance)];
@@ -90,11 +90,11 @@ ol.reproj.enlargeClipPoint_ = function(centroidX, centroidY, x, y) {
  * @param {boolean=} opt_renderEdges Render reprojection edges.
  * @return {HTMLCanvasElement} Canvas with reprojected data.
  */
-ol.reproj.render = function(width, height, pixelRatio,
+_ol_reproj_.render = function(width, height, pixelRatio,
     sourceResolution, sourceExtent, targetResolution, targetExtent,
     triangulation, sources, gutter, opt_renderEdges) {
 
-  var context = ol.dom.createCanvasContext2D(Math.round(pixelRatio * width),
+  var context = createCanvasContext2D(Math.round(pixelRatio * width),
       Math.round(pixelRatio * height));
 
   if (sources.length === 0) {
@@ -103,14 +103,14 @@ ol.reproj.render = function(width, height, pixelRatio,
 
   context.scale(pixelRatio, pixelRatio);
 
-  var sourceDataExtent = ol.extent.createEmpty();
+  var sourceDataExtent = createEmpty();
   sources.forEach(function(src, i, arr) {
-    ol.extent.extend(sourceDataExtent, src.extent);
+    extend(sourceDataExtent, src.extent);
   });
 
-  var canvasWidthInUnits = ol.extent.getWidth(sourceDataExtent);
-  var canvasHeightInUnits = ol.extent.getHeight(sourceDataExtent);
-  var stitchContext = ol.dom.createCanvasContext2D(
+  var canvasWidthInUnits = getWidth(sourceDataExtent);
+  var canvasHeightInUnits = getHeight(sourceDataExtent);
+  var stitchContext = createCanvasContext2D(
       Math.round(pixelRatio * canvasWidthInUnits / sourceResolution),
       Math.round(pixelRatio * canvasHeightInUnits / sourceResolution));
 
@@ -119,8 +119,8 @@ ol.reproj.render = function(width, height, pixelRatio,
   sources.forEach(function(src, i, arr) {
     var xPos = src.extent[0] - sourceDataExtent[0];
     var yPos = -(src.extent[3] - sourceDataExtent[3]);
-    var srcWidth = ol.extent.getWidth(src.extent);
-    var srcHeight = ol.extent.getHeight(src.extent);
+    var srcWidth = getWidth(src.extent);
+    var srcHeight = getHeight(src.extent);
 
     stitchContext.drawImage(
         src.image,
@@ -130,7 +130,7 @@ ol.reproj.render = function(width, height, pixelRatio,
         srcWidth * stitchScale, srcHeight * stitchScale);
   });
 
-  var targetTopLeft = ol.extent.getTopLeft(targetExtent);
+  var targetTopLeft = getTopLeft(targetExtent);
 
   triangulation.getTriangles().forEach(function(triangle, i, arr) {
     /* Calculate affine transform (src -> dst)
@@ -181,7 +181,7 @@ ol.reproj.render = function(width, height, pixelRatio,
       [0, 0, x1, y1, v1 - v0],
       [0, 0, x2, y2, v2 - v0]
     ];
-    var affineCoefs = ol.math.solveLinearSystem(augmentedMatrix);
+    var affineCoefs = solveLinearSystem(augmentedMatrix);
     if (!affineCoefs) {
       return;
     }
@@ -189,9 +189,9 @@ ol.reproj.render = function(width, height, pixelRatio,
     context.save();
     context.beginPath();
     var centroidX = (u0 + u1 + u2) / 3, centroidY = (v0 + v1 + v2) / 3;
-    var p0 = ol.reproj.enlargeClipPoint_(centroidX, centroidY, u0, v0);
-    var p1 = ol.reproj.enlargeClipPoint_(centroidX, centroidY, u1, v1);
-    var p2 = ol.reproj.enlargeClipPoint_(centroidX, centroidY, u2, v2);
+    var p0 = _ol_reproj_.enlargeClipPoint_(centroidX, centroidY, u0, v0);
+    var p1 = _ol_reproj_.enlargeClipPoint_(centroidX, centroidY, u1, v1);
+    var p2 = _ol_reproj_.enlargeClipPoint_(centroidX, centroidY, u2, v2);
 
     context.moveTo(p1[0], p1[1]);
     context.lineTo(p0[0], p0[1]);
@@ -238,3 +238,4 @@ ol.reproj.render = function(width, height, pixelRatio,
   }
   return context.canvas;
 };
+export default _ol_reproj_;

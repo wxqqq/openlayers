@@ -1,16 +1,17 @@
-goog.provide('ol.color');
-
-goog.require('ol.asserts');
-goog.require('ol.math');
+/**
+ * @module ol/color
+ */
+import {assert} from './asserts.js';
+import {clamp} from './math.js';
 
 
 /**
- * This RegExp matches # followed by 3 or 6 hex digits.
+ * This RegExp matches # followed by 3, 4, 6, or 8 hex digits.
  * @const
  * @type {RegExp}
  * @private
  */
-ol.color.HEX_COLOR_RE_ = /^#(?:[0-9a-f]{3}){1,2}$/i;
+var HEX_COLOR_RE_ = /^#(?:[0-9a-f]{3,4}){1,2}$/i;
 
 
 /**
@@ -19,23 +20,7 @@ ol.color.HEX_COLOR_RE_ = /^#(?:[0-9a-f]{3}){1,2}$/i;
  * @type {RegExp}
  * @private
  */
-ol.color.NAMED_COLOR_RE_ = /^([a-z]*)$/i;
-
-
-/**
- * Return the color as an array. This function maintains a cache of calculated
- * arrays which means the result should not be modified.
- * @param {ol.Color|string} color Color.
- * @return {ol.Color} Color.
- * @api
- */
-ol.color.asArray = function(color) {
-  if (Array.isArray(color)) {
-    return color;
-  } else {
-    return ol.color.fromString(/** @type {string} */ (color));
-  }
-};
+var NAMED_COLOR_RE_ = /^([a-z]*)$/i;
 
 
 /**
@@ -44,34 +29,34 @@ ol.color.asArray = function(color) {
  * @return {string} Rgba string.
  * @api
  */
-ol.color.asString = function(color) {
+export function asString(color) {
   if (typeof color === 'string') {
     return color;
   } else {
-    return ol.color.toString(color);
+    return toString(color);
   }
-};
+}
 
 /**
  * Return named color as an rgba string.
  * @param {string} color Named color.
  * @return {string} Rgb string.
  */
-ol.color.fromNamed = function(color) {
+function fromNamed(color) {
   var el = document.createElement('div');
   el.style.color = color;
   document.body.appendChild(el);
   var rgb = getComputedStyle(el).color;
   document.body.removeChild(el);
   return rgb;
-};
+}
 
 
 /**
  * @param {string} s String.
  * @return {ol.Color} Color.
  */
-ol.color.fromString = (
+export var fromString = (
   function() {
 
     // We maintain a small cache of parsed strings.  To provide cheap LRU-like
@@ -114,76 +99,104 @@ ol.color.fromString = (
               }
             }
           }
-          color = ol.color.fromStringInternal_(s);
+          color = fromStringInternal_(s);
           cache[s] = color;
           ++cacheSize;
         }
         return color;
-      });
+      }
+    );
 
   })();
 
+/**
+ * Return the color as an array. This function maintains a cache of calculated
+ * arrays which means the result should not be modified.
+ * @param {ol.Color|string} color Color.
+ * @return {ol.Color} Color.
+ * @api
+ */
+export function asArray(color) {
+  if (Array.isArray(color)) {
+    return color;
+  } else {
+    return fromString(/** @type {string} */ (color));
+  }
+}
 
 /**
  * @param {string} s String.
  * @private
  * @return {ol.Color} Color.
  */
-ol.color.fromStringInternal_ = function(s) {
+function fromStringInternal_(s) {
   var r, g, b, a, color, parts;
 
-  if (ol.color.NAMED_COLOR_RE_.exec(s)) {
-    s = ol.color.fromNamed(s);
+  if (NAMED_COLOR_RE_.exec(s)) {
+    s = fromNamed(s);
   }
 
-  if (ol.color.HEX_COLOR_RE_.exec(s)) { // hex
+  if (HEX_COLOR_RE_.exec(s)) { // hex
     var n = s.length - 1; // number of hex digits
-    ol.asserts.assert(n == 3 || n == 6, 54); // Hex color should have 3 or 6 digits
-    var d = n == 3 ? 1 : 2; // number of digits per channel
+    var d; // number of digits per channel
+    if (n <= 4) {
+      d = 1;
+    } else {
+      d = 2;
+    }
+    var hasAlpha = n === 4 || n === 8;
     r = parseInt(s.substr(1 + 0 * d, d), 16);
     g = parseInt(s.substr(1 + 1 * d, d), 16);
     b = parseInt(s.substr(1 + 2 * d, d), 16);
+    if (hasAlpha) {
+      a = parseInt(s.substr(1 + 3 * d, d), 16);
+    } else {
+      a = 255;
+    }
     if (d == 1) {
       r = (r << 4) + r;
       g = (g << 4) + g;
       b = (b << 4) + b;
+      if (hasAlpha) {
+        a = (a << 4) + a;
+      }
     }
-    a = 1;
-    color = [r, g, b, a];
+    color = [r, g, b, a / 255];
   } else if (s.indexOf('rgba(') == 0) { // rgba()
     parts = s.slice(5, -1).split(',').map(Number);
-    color = ol.color.normalize(parts);
+    color = normalize(parts);
   } else if (s.indexOf('rgb(') == 0) { // rgb()
     parts = s.slice(4, -1).split(',').map(Number);
     parts.push(1);
-    color = ol.color.normalize(parts);
+    color = normalize(parts);
   } else {
-    ol.asserts.assert(false, 14); // Invalid color
+    assert(false, 14); // Invalid color
   }
   return /** @type {ol.Color} */ (color);
-};
+}
 
 
 /**
+ * TODO this function is only used in the test, we probably shouldn't export it
  * @param {ol.Color} color Color.
  * @param {ol.Color=} opt_color Color.
  * @return {ol.Color} Clamped color.
  */
-ol.color.normalize = function(color, opt_color) {
+export function normalize(color, opt_color) {
   var result = opt_color || [];
-  result[0] = ol.math.clamp((color[0] + 0.5) | 0, 0, 255);
-  result[1] = ol.math.clamp((color[1] + 0.5) | 0, 0, 255);
-  result[2] = ol.math.clamp((color[2] + 0.5) | 0, 0, 255);
-  result[3] = ol.math.clamp(color[3], 0, 1);
+  result[0] = clamp((color[0] + 0.5) | 0, 0, 255);
+  result[1] = clamp((color[1] + 0.5) | 0, 0, 255);
+  result[2] = clamp((color[2] + 0.5) | 0, 0, 255);
+  result[3] = clamp(color[3], 0, 1);
   return result;
-};
+}
 
 
 /**
  * @param {ol.Color} color Color.
  * @return {string} String.
  */
-ol.color.toString = function(color) {
+export function toString(color) {
   var r = color[0];
   if (r != (r | 0)) {
     r = (r + 0.5) | 0;
@@ -198,4 +211,4 @@ ol.color.toString = function(color) {
   }
   var a = color[3] === undefined ? 1 : color[3];
   return 'rgba(' + r + ',' + g + ',' + b + ',' + a + ')';
-};
+}

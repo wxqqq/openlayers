@@ -1,26 +1,26 @@
-goog.require('ol.Map');
-goog.require('ol.View');
-goog.require('ol.geom.Polygon');
-goog.require('ol.interaction.Draw');
-goog.require('ol.layer.Tile');
-goog.require('ol.layer.Vector');
-goog.require('ol.source.OSM');
-goog.require('ol.source.Vector');
+import Map from '../src/ol/Map.js';
+import _ol_View_ from '../src/ol/View.js';
+import Polygon from '../src/ol/geom/Polygon.js';
+import Draw from '../src/ol/interaction/Draw.js';
+import TileLayer from '../src/ol/layer/Tile.js';
+import _ol_layer_Vector_ from '../src/ol/layer/Vector.js';
+import _ol_source_OSM_ from '../src/ol/source/OSM.js';
+import _ol_source_Vector_ from '../src/ol/source/Vector.js';
 
-var raster = new ol.layer.Tile({
-  source: new ol.source.OSM()
+var raster = new TileLayer({
+  source: new _ol_source_OSM_()
 });
 
-var source = new ol.source.Vector({wrapX: false});
+var source = new _ol_source_Vector_({wrapX: false});
 
-var vector = new ol.layer.Vector({
+var vector = new _ol_layer_Vector_({
   source: source
 });
 
-var map = new ol.Map({
+var map = new Map({
   layers: [raster, vector],
   target: 'map',
-  view: new ol.View({
+  view: new _ol_View_({
     center: [-11000000, 4600000],
     zoom: 4
   })
@@ -35,15 +35,15 @@ function addInteraction() {
     var geometryFunction;
     if (value === 'Square') {
       value = 'Circle';
-      geometryFunction = ol.interaction.Draw.createRegularPolygon(4);
+      geometryFunction = Draw.createRegularPolygon(4);
     } else if (value === 'Box') {
       value = 'Circle';
-      geometryFunction = ol.interaction.Draw.createBox();
+      geometryFunction = Draw.createBox();
     } else if (value === 'Star') {
       value = 'Circle';
       geometryFunction = function(coordinates, geometry) {
         if (!geometry) {
-          geometry = new ol.geom.Polygon(null);
+          geometry = new Polygon(null);
         }
         var center = coordinates[0];
         var last = coordinates[1];
@@ -65,9 +65,9 @@ function addInteraction() {
         return geometry;
       };
     }
-    draw = new ol.interaction.Draw({
+    draw = new Draw({
       source: source,
-      type: /** @type {ol.geom.GeometryType} */ (value),
+      type: value,
       geometryFunction: geometryFunction
     });
     map.addInteraction(draw);

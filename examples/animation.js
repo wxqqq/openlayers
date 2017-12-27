@@ -1,27 +1,27 @@
-goog.require('ol.Map');
-goog.require('ol.View');
-goog.require('ol.easing');
-goog.require('ol.layer.Tile');
-goog.require('ol.proj');
-goog.require('ol.source.OSM');
+import Map from '../src/ol/Map.js';
+import _ol_View_ from '../src/ol/View.js';
+import {easeIn, easeOut} from '../src/ol/easing.js';
+import TileLayer from '../src/ol/layer/Tile.js';
+import {fromLonLat} from '../src/ol/proj.js';
+import _ol_source_OSM_ from '../src/ol/source/OSM.js';
 
-var london = ol.proj.fromLonLat([-0.12755, 51.507222]);
-var moscow = ol.proj.fromLonLat([37.6178, 55.7517]);
-var istanbul = ol.proj.fromLonLat([28.9744, 41.0128]);
-var rome = ol.proj.fromLonLat([12.5, 41.9]);
-var bern = ol.proj.fromLonLat([7.4458, 46.95]);
+var london = fromLonLat([-0.12755, 51.507222]);
+var moscow = fromLonLat([37.6178, 55.7517]);
+var istanbul = fromLonLat([28.9744, 41.0128]);
+var rome = fromLonLat([12.5, 41.9]);
+var bern = fromLonLat([7.4458, 46.95]);
 
-var view = new ol.View({
+var view = new _ol_View_({
   center: istanbul,
   zoom: 6
 });
 
-var map = new ol.Map({
+var map = new Map({
   target: 'map',
   layers: [
-    new ol.layer.Tile({
+    new TileLayer({
       preload: 4,
-      source: new ol.source.OSM()
+      source: new _ol_source_OSM_()
     })
   ],
   // Improve user experience by loading tiles while animating. Will make
@@ -79,11 +79,11 @@ onClick('rotate-around-rome', function() {
   view.animate({
     rotation: rotation + Math.PI,
     anchor: rome,
-    easing: ol.easing.easeIn
+    easing: easeIn
   }, {
     rotation: rotation + 2 * Math.PI,
     anchor: rome,
-    easing: ol.easing.easeOut
+    easing: easeOut
   });
 });
 
@@ -119,11 +119,11 @@ onClick('spin-to-rome', function() {
       center[1] + (rome[1] - center[1]) / 2
     ],
     rotation: Math.PI,
-    easing: ol.easing.easeIn
+    easing: easeIn
   }, {
     center: rome,
     rotation: 2 * Math.PI,
-    easing: ol.easing.easeOut
+    easing: easeOut
   });
 });
 
