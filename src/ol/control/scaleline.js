@@ -231,6 +231,19 @@ ol.control.ScaleLine.prototype.updateElement_ = function() {
       suffix = 'mi';
       pointResolution /= 1609.3472;
     }
+  } else if (units == ol.control.ScaleLineUnits.ZH) {
+    if (nominalCount < 0.001) {
+      suffix = '\u5fae\u7c73';
+      pointResolution *= 1000000;
+    } else if (nominalCount < 1) {
+      suffix = '\u6beb\u7c73';
+      pointResolution *= 1000;
+    } else if (nominalCount < 1000) {
+      suffix = '\u7c73';
+    } else {
+      suffix = '\u516c\u91cc';
+      pointResolution /= 1000;
+    }
   } else {
     ol.asserts.assert(false, 33); // Invalid units
   }

@@ -10,5 +10,6 @@ ol.control.ScaleLineUnits = {
   IMPERIAL: 'imperial',
   NAUTICAL: 'nautical',
   METRIC: 'metric',
-  US: 'us'
+  US: 'us',
+  ZH: 'zh'
 };
